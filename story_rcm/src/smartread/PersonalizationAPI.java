@@ -32,6 +32,8 @@ public class PersonalizationAPI {
         String freq;
         if(lookbackMinute==5)
             freq = "5m";
+        else if(lookbackMinute==60)
+            freq = "1h";
         else if(lookbackMinute==60*24)
             freq = "1d";
         else if(lookbackMinute==60*24*7)
@@ -74,12 +76,16 @@ public class PersonalizationAPI {
     public static void main(String args[]) {
         logger.trace("Entering application.");
         
+        if(args.length!=1){
+            logger.error("Please pass in user name to query stories.");
+            return;
+        }
         PersonalizationAPI api = new PersonalizationAPI();
         api.updateUserInterests(5);
 
-        List<Story> stories = api.getUserStory("test_user1");
+        List<Story> stories = api.getUserStory(args[0]);
         for (Story s : stories) {
-            System.out.println(s);
+            System.out.println("{"+s.getStoryID()+": "+s.getScore()+"}");
         }
         logger.trace("Exiting application.");
     }

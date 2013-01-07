@@ -30,15 +30,19 @@ public class DBUser extends DBBase{
             }
         }
         
-        DBCollection coll = db.getCollection("users");
+        DBCollection coll = db.getCollection(DB_USER_TABLE);
 
-        DBObject obj = new BasicDBObject("uid", uid);
+        DBObject obj = new BasicDBObject(DB_UID_FIELD, uid);
         DBObject userInfo = coll.findOne(obj);
+        if(userInfo==null){
+            logger.error("Cannot find user: "+uid+" in DB");
+            return null;
+        }
 
         Map<String, Double> maps = new HashMap<String, Double>();
         DBObject interests;
 
-        String[] int_info = { "interests_5m", "interests_1d", "interests_7d" };
+        String[] int_info = { "interests_5m", "interests_1h", "interests_1d", "interests_7d" };
         for (String s : int_info) {
             interests = (DBObject) userInfo.get(s);
             for (String key : interests.keySet()) {
@@ -57,7 +61,7 @@ public class DBUser extends DBBase{
         Long endtime = System.currentTimeMillis();
         logger.debug("Time(ms) taken to retrive user from DB: "+ String.valueOf(endtime-starttime));
 
-        return new User((String) userInfo.get("uid"), maps);
+        return new User((String) userInfo.get(DB_UID_FIELD), maps);
     }
 
     public static void updateUserInterest(String uid, String freq, Map<List<String>, Double> tags) {
@@ -73,9 +77,9 @@ public class DBUser extends DBBase{
             }
         }
 
-        DBCollection coll = db.getCollection("users");
+        DBCollection coll = db.getCollection(DB_USER_TABLE);
 
-        DBObject query = new BasicDBObject("uid", uid);
+        DBObject query = new BasicDBObject(DB_UID_FIELD, uid);
         
         BasicDBObject interestsDB = new BasicDBObject();
         for (List<String> key : tags.keySet()) {

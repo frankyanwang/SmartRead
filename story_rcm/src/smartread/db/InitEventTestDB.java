@@ -12,7 +12,7 @@ public class InitEventTestDB {
         MongoClient mongoClient = new MongoClient();
         DB db = mongoClient.getDB("test");
         DBCollection coll = db.getCollection("serve_events");
-        // coll.drop();
+        //coll.drop();
         BasicDBObject doc = new BasicDBObject("story_id", "50d25afcc5ace13555000006")
                 .append("uid", "test_user1")
                 .append("timespend", 300).append("tags", "tech")

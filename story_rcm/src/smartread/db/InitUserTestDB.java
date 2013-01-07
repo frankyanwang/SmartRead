@@ -16,6 +16,7 @@ public class InitUserTestDB {
         BasicDBObject doc = new BasicDBObject("uid", "test_user1")
                 .append("interests_5m",
                         new BasicDBObject("tech", 2).append("news", 3))
+                .append("interests_1h", new BasicDBObject())
                 .append("interests_1d", new BasicDBObject("tech", 1))
                 .append("interests_7d", new BasicDBObject("tech", 1));
         coll.insert(doc);
@@ -23,6 +24,7 @@ public class InitUserTestDB {
         doc = new BasicDBObject("uid", "test_user2")
                 .append("interests_5m",
                         new BasicDBObject("spt", 3).append("fas", 2))
+                .append("interests_1h", new BasicDBObject())
                 .append("interests_1d", new BasicDBObject())
                 .append("interests_7d", new BasicDBObject("tech", 1));
         coll.insert(doc);
@@ -30,6 +32,7 @@ public class InitUserTestDB {
         doc = new BasicDBObject("uid", "test_user3")
                 .append("interests_5m",
                         new BasicDBObject("spt", 3).append("tech", 2))
+                .append("interests_1h", new BasicDBObject())
                 .append("interests_1d", new BasicDBObject())
                 .append("interests_7d", new BasicDBObject());
         coll.insert(doc);

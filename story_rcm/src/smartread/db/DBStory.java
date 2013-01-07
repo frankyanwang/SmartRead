@@ -31,17 +31,17 @@ public class DBStory extends DBBase{
             }
         }
         
-        DBCollection coll = db.getCollection("stories");
+        DBCollection coll = db.getCollection(DB_STORY_TABLE);
 
         DBCursor cursor = coll.find();
         List<Story> stories = new ArrayList<Story>();
         try {
             while (cursor.hasNext()) {
                 DBObject obj = cursor.next();
-                Double score = Double.valueOf(obj.get("score").toString());
-                String id = obj.get("_id").toString();
+                Double score = Double.valueOf(obj.get(DB_SCORE_FIELD).toString());
+                String id = obj.get(DB_OID_FIELD).toString();
                 List<String> tags = new ArrayList<String>();
-                tags.add((String) obj.get("category"));
+                tags.add((String) obj.get(DB_CATEGORY_FIELD));
                 stories.add(new Story(id, score, tags));
             }
         } finally {
@@ -65,15 +65,15 @@ public class DBStory extends DBBase{
             }
         }
 
-        DBCollection coll = db.getCollection("stories");
+        DBCollection coll = db.getCollection(DB_STORY_TABLE);
 
-        DBObject q = new BasicDBObject("_id", new ObjectId(storyID));
+        DBObject q = new BasicDBObject(DB_OID_FIELD, new ObjectId(storyID));
         
         DBObject story = coll.findOne(q);
         
-        Double score = Double.valueOf((String) story.get("score"));
+        Double score = Double.valueOf((String) story.get(DB_SCORE_FIELD));
         List<String> tags = new ArrayList<String>();
-        tags.add((String) story.get("category"));
+        tags.add((String) story.get(DB_CATEGORY_FIELD));
         
         Long endtime = System.currentTimeMillis();
         logger.debug("Time(ms) taken to retrive story "+storyID+" from DB: "+ String.valueOf(endtime-starttime));
