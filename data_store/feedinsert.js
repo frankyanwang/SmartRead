@@ -1,14 +1,28 @@
 var feedparser = require('feedparser'),
     cheerio = require('cheerio'),
+    request = require('request'),
 	mongo = require('mongodb'),
 	gridstore = mongo.GridStore,
 	config = require('./config.js'),
 	host = require('./config.js').host,
 	port = require('./config.js').port,
-	db = new mongo.Db("newstest", new mongo.Server(host, port, {}), {safe:false});
+	db = new mongo.Db("smartreaddb", new mongo.Server(host, port, {}), {safe:false});
 
+//var tags;
+// function getTags(link){
 
-function callback (error, meta, articles){
+// 	var tags;
+// 	request(link, function(error, response, body) {
+// 		if (error) throw error
+//         var $ = cheerio.load(body);
+//         tags = $('meta[name=keywords]').attr('content');
+       
+//     });
+//     console.log(tags);
+//     return tags;
+// };
+
+function callback(error, meta, articles){
   if (error) {
   	console.error(error);
   } else {
@@ -17,13 +31,17 @@ function callback (error, meta, articles){
 
 		console.log("connected " + host + ":" + port);
 
-		db.collection("story", function(error, collection){
+		db.collection("posts", function(error, collection){
 			
 		    articles.forEach(function (article){
 
+		  //   	request(article.link, function(error, response, body) {
+    //     			var $ = cheerio.load(body);
+    //       			tags = $('meta[name=keywords]').attr('content');
+    //   			});
+				// //var tags = getTags(article.link);
+
   				var $ = cheerio.load(article.description);
- 
-			    //console.log($('img').first().attr('src') + '\n');
 			    var imgurl = $('img').first().attr('src');
 				var id = new mongo.ObjectID();
 				var filename = id + '.' + imgurl.split('.').pop();	
@@ -34,16 +52,17 @@ function callback (error, meta, articles){
 				}, {
 					_id: id,
 					source: meta.title,
-					title: article.title,
+					name: article.title,
 					link: article.link,
-					summary: article.summary,
-					description: article.description,
-					pubdate: article.pubdate,
+					description: article.summary,
+					content: article.description,
+					pubDate: article.pubdate,
 					guid: article.guid,
 					author: article.author,	
 					comments: article.comments,
-					category: config.category[meta.link],
-					image: imgurl				
+					//: config.category[meta.link],
+					//keywords: tags,
+					picture: imgurl				
 				}, {
 					upsert: true
 				}, function(){
@@ -72,7 +91,7 @@ function callback (error, meta, articles){
   }//else
 }//callback
 
-feedparser.parseUrl(config.sites.tech.url1, callback);
+feedparser.parseUrl(config.sites.tech.url2, callback);
 // for(var i = 0; i <urllist.length; i++){
 // 	feedparser.parseUrl(urllist[i], callback);
 // }
