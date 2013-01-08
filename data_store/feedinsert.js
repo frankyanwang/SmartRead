@@ -1,6 +1,6 @@
 var feedparser = require('feedparser'),
     cheerio = require('cheerio'),
-//    request = require('request'),
+	request = require('request'),
 	mongo = require('mongodb'),
 	gridstore = mongo.GridStore,
 	config = require('./config.js'),
@@ -8,19 +8,15 @@ var feedparser = require('feedparser'),
 	port = require('./config.js').port,
 	db = new mongo.Db("smartreaddb", new mongo.Server(host, port, {}), {safe:false});
 
-//var tags;
-// function getTags(link){
+function getTags(link, fn){
 
-// 	var tags;
-// 	request(link, function(error, response, body) {
-// 		if (error) throw error
-//         var $ = cheerio.load(body);
-//         tags = $('meta[name=keywords]').attr('content');
-       
-//     });
-//     console.log(tags);
-//     return tags;
-// };
+	request(link, function(error, response, body) {
+		if (error) throw error
+        var $ = cheerio.load(body);
+        fn($('meta[name=keywords]').attr('content'));       
+    });
+
+};
 
 function callback(error, meta, articles){
   if (error) {
@@ -43,13 +39,37 @@ function callback(error, meta, articles){
     //   			});
 				// //var tags = getTags(article.link);
 
+				// (function getTags(){
+
+				// 	var tags;
+				// 	request(article.link, function(error, response, body) {
+				// 		if (error) throw error
+				// 	    var $ = cheerio.load(body);
+				// 	    tags = $('meta[name=keywords]').attr('content');
+					       
+				// 	});
+				// 	console.log(tags);
+				// 	return tags;
+				// } ());
+
+
+			    	// request(article.link, function(error, response, body) {
+	       //  			var $ = cheerio.load(body);
+	       //    			var tags = $('meta[name=keywords]').attr('content');
+
+	       //    			collection.findAndModify({_id:id}, {$set:{tags:tags}}, function(error, doc){
+	       //    				console.log("tags added!");
+	       //    			});
+	      	// 		});	
+
+
+
   				var $ = cheerio.load(article.description);
 			    var imgurl = $('img').first().attr('src');
 				var id = new mongo.ObjectID();
 				var filename = id + '.' + imgurl.split('.').pop();	
 				
 				collection.update({
-					pubdate: article.pubdate,
 					guid: article.guid
 				}, {
 					_id: id,
@@ -59,17 +79,32 @@ function callback(error, meta, articles){
 					description: article.summary,
 					content: article.description,
 					pubDate: article.pubdate,
+					date: article.date,
 					guid: article.guid,
 					author: article.author,	
 					comments: article.comments,
+					tags: article.categories,
 					//: config.category[meta.link],
-					//keywords: tags,
+					//tags: "",
 					picture: imgurl				
 				}, {
 					upsert: true
 				}, function(){
-					console.log(id + " with url=" + article.guid + " successfully inserted or updated!");					
-				});	
+					console.log(id + " with url=" + article.guid + " successfully inserted or updated!");	
+
+				});
+
+				// getTags(article.link, function(keywords){
+				// 	console.log("curent id is " +id + ", and tags is " + keywords);
+
+				// 	collection.update({
+				// 		link: article.link
+				// 	}, { $set:{ tags: keywords }			
+				// 	}, function(){
+				// 		console.log("Updated tags for id " + id);	
+
+				// 	});
+				// });				
 
 				//insert images to db
 				  // Open a new file
@@ -94,7 +129,6 @@ function callback(error, meta, articles){
 }//callback
 
 feedparser.parseUrl(config.sites.tech.url1, callback);
-feedparser.parseUrl(config.sites.tech.url2, callback);
 // for(var i = 0; i <urllist.length; i++){
 // 	feedparser.parseUrl(urllist[i], callback);
 // }
