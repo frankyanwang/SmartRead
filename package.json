@@ -12,7 +12,8 @@
         "underscore": "1.4.3",
         "socket.io": "0.9.10",
         "feedparser": "0.10.9",
-        "cheerio": "0.10.5"
+        "cheerio": "0.10.5",
+        "request": "2.12.0"
     },
     "engines": {
         "node": "0.8.4",
