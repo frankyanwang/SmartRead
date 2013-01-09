@@ -96,7 +96,7 @@ public class DBUser extends DBBase{
         }
         
         coll.update(query, new BasicDBObject().append("$set", 
-                new BasicDBObject().append("interests_"+freq, interestsDB)));
+                new BasicDBObject().append("interests_"+freq, interestsDB).append("last_update", System.currentTimeMillis())));
         Long endtime = System.currentTimeMillis();
         logger.debug("Time(ms) taken to update interests for user "+uid+": "+ String.valueOf(endtime-starttime));
     }

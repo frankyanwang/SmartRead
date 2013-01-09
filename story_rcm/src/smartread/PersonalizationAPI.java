@@ -4,10 +4,12 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import smartread.db.DBServeEvent;
 import smartread.db.DBStory;
 import smartread.db.DBUser;
+import smartread.db.DBUserStoryIndex;
 
 import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.LogManager;
@@ -26,7 +28,7 @@ public class PersonalizationAPI {
         return calcualte(user, stories);
     }
 
-    public void updateUserInterests(int lookbackMinute) {
+    public Set<String> updateUserInterests(int lookbackMinute) {
         Long starttime = System.currentTimeMillis();
         Map<String, List<ServeEvent>> serves = DBServeEvent.QueryEvents(lookbackMinute);
         String freq;
@@ -39,7 +41,7 @@ public class PersonalizationAPI {
         else if(lookbackMinute==60*24*7)
             freq = "7d";
         else{
-            return;
+            return null;
         }
         
         for (String uid : serves.keySet()) {
@@ -50,12 +52,18 @@ public class PersonalizationAPI {
             for(ServeEvent s: userServes){
                 String storyID = s.getStoryID();
                 Story story = DBStory.getStory(storyID);
-                tags.put(new ArrayList<String>(story.getTags()), s.getTimespend()/300.0);
+                List<String> temp = new ArrayList<String>(story.getTags());
+                if(tags.containsKey(temp)){
+                    tags.put(temp, s.getTimespend()/300.0+tags.get(temp));
+                }else{
+                    tags.put(temp, s.getTimespend()/300.0);
+                }
             }
             DBUser.updateUserInterest(uid, freq, tags);
         }
         Long endtime = System.currentTimeMillis();
         logger.debug("Time(ms) taken to update user interests for "+lookbackMinute+" minutes: "+ String.valueOf(endtime-starttime));
+        return serves.keySet();
     }
 
     private List<Story> calcualte(User user, List<Story> stories) {
@@ -73,20 +81,31 @@ public class PersonalizationAPI {
         return stories;
     }
 
-    public static void main(String args[]) {
+    public static void main(String args[]) throws InterruptedException {
         logger.trace("Entering application.");
-        
-        if(args.length!=1){
-            logger.error("Please pass in user name to query stories.");
-            return;
-        }
-        PersonalizationAPI api = new PersonalizationAPI();
-        api.updateUserInterests(5);
 
-        List<Story> stories = api.getUserStory(args[0]);
-        for (Story s : stories) {
-            System.out.println("{"+s.getStoryID()+": "+s.getScore()+"}");
+        PersonalizationAPI api = new PersonalizationAPI();
+        
+        while(true){
+            try{
+                logger.trace("Entering while loop.");
+    
+                Set<String> updatedUsers = api.updateUserInterests(5);
+                
+                if(updatedUsers==null)
+                    continue;
+                
+                for(String uid: updatedUsers){
+                    List<Story> stories = api.getUserStory(uid);
+                    api.storeUserStory(uid, stories);
+                }
+            }finally{
+                Thread.sleep(60*1000);
+            }
         }
-        logger.trace("Exiting application.");
+    }
+
+    private void storeUserStory(String uid, List<Story> stories) {
+        DBUserStoryIndex.storeUserStory(uid, stories);
     }
 }
