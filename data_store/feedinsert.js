@@ -31,43 +31,15 @@ function callback(error, meta, articles){
 			
 		    articles.forEach(function (article){
 
-                console.log(article);
-
-		  //   	request(article.link, function(error, response, body) {
-    //     			var $ = cheerio.load(body);
-    //       			tags = $('meta[name=keywords]').attr('content');
-    //   			});
-				// //var tags = getTags(article.link);
-
-				// (function getTags(){
-
-				// 	var tags;
-				// 	request(article.link, function(error, response, body) {
-				// 		if (error) throw error
-				// 	    var $ = cheerio.load(body);
-				// 	    tags = $('meta[name=keywords]').attr('content');
-					       
-				// 	});
-				// 	console.log(tags);
-				// 	return tags;
-				// } ());
-
-
-			    	// request(article.link, function(error, response, body) {
-	       //  			var $ = cheerio.load(body);
-	       //    			var tags = $('meta[name=keywords]').attr('content');
-
-	       //    			collection.findAndModify({_id:id}, {$set:{tags:tags}}, function(error, doc){
-	       //    				console.log("tags added!");
-	       //    			});
-	      	// 		});	
-
-
-
   				var $ = cheerio.load(article.description);
 			    var imgurl = $('img').first().attr('src');
 				var id = new mongo.ObjectID();
-				var filename = id + '.' + imgurl.split('.').pop();	
+				var filename;
+				if (imgurl) {
+					var filename = id + '.' + imgurl.split('.').pop();		
+				} 
+
+				console.log(cheerio.load(article.description)('p').text() + "\n************************************\n");
 				
 				collection.update({
 					guid: article.guid
@@ -76,7 +48,7 @@ function callback(error, meta, articles){
 					source: meta.title,
 					name: article.title,
 					link: article.link,
-					description: article.summary,
+					description: cheerio.load(article.description)('p').text(),
 					content: article.description,
 					pubDate: article.pubdate,
 					date: article.date,
@@ -107,7 +79,7 @@ function callback(error, meta, articles){
 				// });				
 
 				//insert images to db
-				  // Open a new file
+				//Open a new file
   				var gs = new gridstore(db, filename, 'w');
 
   				// Open the new file
@@ -128,10 +100,25 @@ function callback(error, meta, articles){
   }//else
 }//callback
 
-feedparser.parseUrl(config.sites.tech.url1, callback);
-// for(var i = 0; i <urllist.length; i++){
-// 	feedparser.parseUrl(urllist[i], callback);
-// }
+function parsefeed(feedurl){
+	request(feedurl, function (error, response, body) {
+	  if (!error && response.statusCode == 200) {
+	    feedparser.parseString(body, callback);
+	  }
+	});
+}
 
-//console.log(config.divimg["http://www.ifanr.com"]);
-//console.log(config.sites.tech.link3);
+parsefeed(config.sites.fashion.url2);
+	// request(config.sites.fashion.url1, function (error, response, body) {
+	//   if (!error && response.statusCode == 200) {
+	//     //feedparser.parseString(body, callback);
+	//     console.log(body);
+	//   }
+	// });
+
+
+// for(var i in config.sites.tech) {
+//     if (config.sites.tech.hasOwnProperty(i)) {
+//         parsefeed(config.sites.tech[i]);
+//     }
+// }

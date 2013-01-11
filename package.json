@@ -11,7 +11,7 @@
         "emailjs": "0.3.4",
         "underscore": "1.4.3",
         "socket.io": "0.9.10",
-        "feedparser": "0.10.9",
+        "feedparser": "0.10.13",
         "cheerio": "0.10.5",
         "request": "2.12.0"
     },

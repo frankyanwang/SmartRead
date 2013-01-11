@@ -34,15 +34,17 @@ config.sites = {
 		url1: "http://tech2ipo.com/feed",
 		url2: "http://www.ifanr.com/feed",
 		url3: "http://www.36kr.com/feed",
-		url4: "http://www.leiphone.com/feed",
+		url4: "http://www.leiphone.com/feed", //not working with image and link
 		url5: "http://feeds.geekpark.net" //not working with image
 	},
 
-	webs: {
+	web: {
 
 	},
 
 	fashion: {
+		url1: "http://www.fashiondes.com/rss",
+		url2: "http://www.haibao.cn/feed/"
 
 	},
 
@@ -51,6 +53,8 @@ config.sites = {
 	},
 
 	movie: {
+		url1: "http://smweekly.feedsportal.com/c/35020/f/646841/index.rss",
+		url2: "http://news.baidu.com/n?cmd=1&class=enternews&tn=rss"		
 
 	},
 
