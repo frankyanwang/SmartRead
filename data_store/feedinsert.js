@@ -1,6 +1,7 @@
 var feedparser = require('feedparser'),
     cheerio = require('cheerio'),
 	request = require('request'),
+	mongo = require('mongodb'),
 	gridstore = mongo.GridStore,
 	config = require('./config.js');
 
@@ -23,49 +24,21 @@ function callback(error, meta, articles){
   if (error) {
   	console.error(error);
   } else {
-        console.log(meta);
+        //console.log(meta);
 
 		dataProvider.db.collection("posts", function(error, collection){
 			
         articles.forEach(function (article){
 
-//                console.log(article);
-
-      //   	request(article.link, function(error, response, body) {
-//     			var $ = cheerio.load(body);
-//       			tags = $('meta[name=keywords]').attr('content');
-//   			});
-            // //var tags = getTags(article.link);
-
-            // (function getTags(){
-
-            // 	var tags;
-            // 	request(article.link, function(error, response, body) {
-            // 		if (error) throw error
-            // 	    var $ = cheerio.load(body);
-            // 	    tags = $('meta[name=keywords]').attr('content');
-
-            // 	});
-            // 	console.log(tags);
-            // 	return tags;
-            // } ());
-
-
-                // request(article.link, function(error, response, body) {
-       //  			var $ = cheerio.load(body);
-       //    			var tags = $('meta[name=keywords]').attr('content');
-
-       //    			collection.findAndModify({_id:id}, {$set:{tags:tags}}, function(error, doc){
-       //    				console.log("tags added!");
-       //    			});
-        // 		});
-
-
 
             var $ = cheerio.load(article.description);
             var imgurl = $('img').first().attr('src');
             var id = new mongo.ObjectID();
-            var filename = id + '.' + imgurl.split('.').pop();
+
+            var filename;
+            if (imgurl) {
+				filename = id + '.' + imgurl.split('.').pop();		
+			}
 
             collection.update({
                 guid: article.guid
@@ -74,7 +47,7 @@ function callback(error, meta, articles){
                 source: meta.title,
                 name: article.title,
                 link: article.link,
-                description: article.summary,
+                description: cheerio.load(article.description)('p').text(),
                 content: article.description,
                 pubDate: article.pubdate,
                 date: article.date,
@@ -82,8 +55,6 @@ function callback(error, meta, articles){
                 author: article.author,
                 comments: article.comments,
                 tags: article.categories,
-                //: config.category[meta.link],
-                //tags: "",
                 picture: imgurl
             }, {
                 upsert: true
@@ -106,28 +77,37 @@ function callback(error, meta, articles){
 
             //insert images to db
               // Open a new file
-//  				var gs = new gridstore(db, filename, 'w');
-//
-//  				// Open the new file
-//  				gs.open(function(err, gridStore) {
-//
-//    				// Write the file to gridFS
-//    				gs.writeFile(imgurl, function(err, doc) {
-//    					console.log('image ' + filename + ' inserted into gridstore.');
-//    				});
-//  				});
+ 				var gs = new gridstore(dataProvider.db, filename, 'w');
+
+ 				// Open the new file
+ 				gs.open(function(err, gridStore) {
+
+   					// Write the file to gridFS
+	   				gs.writeFile(imgurl, function(err, doc) {
+	   					console.log('image ' + filename + ' inserted into gridstore.');
+	   				});
+ 				});
 
 
         });
     });
-      dataProvider.db.close();
+    dataProvider.db.close();
   }//else
 }//callback
 
-feedparser.parseUrl(config.sites.tech.url1, callback);
-// for(var i = 0; i <urllist.length; i++){
-// 	feedparser.parseUrl(urllist[i], callback);
-// }
 
-//console.log(config.divimg["http://www.ifanr.com"]);
-//console.log(config.sites.tech.link3);
+function parsefeed(feedurl){
+	request(feedurl, function (error, response, body) {
+	  if (!error && response.statusCode == 200) {
+	    feedparser.parseString(body, callback);
+	  }
+	});
+}
+
+parsefeed(config.sites.tech.url1);
+
+// for(var i in config.sites.tech) {
+//     if (config.sites.tech.hasOwnProperty(i)) {
+//         parsefeed(config.sites.tech[i]);
+//     }
+// }
