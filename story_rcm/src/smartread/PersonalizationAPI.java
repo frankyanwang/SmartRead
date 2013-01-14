@@ -84,23 +84,20 @@ public class PersonalizationAPI {
     public static void main(String args[]) throws InterruptedException {
         logger.trace("Entering application.");
 
-        PersonalizationAPI api = new PersonalizationAPI();
+        if(args.length!=1){
+            logger.error("Please input the update freq in minuts");
+            return;
+        }
+        int freq = Integer.parseInt(args[0]);
         
-        while(true){
-            try{
-                logger.trace("Entering while loop.");
-    
-                Set<String> updatedUsers = api.updateUserInterests(5);
-                
-                if(updatedUsers==null)
-                    continue;
-                
-                for(String uid: updatedUsers){
-                    List<Story> stories = api.getUserStory(uid);
-                    api.storeUserStory(uid, stories);
-                }
-            }finally{
-                Thread.sleep(60*1000);
+        PersonalizationAPI api = new PersonalizationAPI();
+
+        Set<String> updatedUsers = api.updateUserInterests(freq);
+
+        if (updatedUsers != null) {
+            for (String uid : updatedUsers) {
+                List<Story> stories = api.getUserStory(uid);
+                api.storeUserStory(uid, stories);
             }
         }
     }
