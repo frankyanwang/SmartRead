@@ -1,8 +1,5 @@
 package smartread.db;
 
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.IOException;
 import java.net.UnknownHostException;
 import java.util.Properties;
 
@@ -13,24 +10,14 @@ public abstract class DBBase {
     static MongoClient mongoClient = null;
     static DB db = null;
     static Properties prop = new Properties();
-    static {
-        try {
-            prop.load(new FileInputStream("conf/db.conf"));
-        } catch (FileNotFoundException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        } catch (IOException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        }
-    }
-    static final String DB_HOST = prop.getProperty("host");
-    static final int DB_PORT = Integer.parseInt(prop.getProperty("port"));
+
+    static String DB_HOST = "localhost";
+    static int DB_PORT = 27017;
     
-    static final String DB_NAME = prop.getProperty("db");;
-    static final String DB_USERNAME = prop.getProperty("username");;
-    static final char[] DB_PASSWORD = prop.getProperty("password").toCharArray();
-    
+    static String DB_NAME = "test";
+    static String DB_USERNAME = "";
+    static char[] DB_PASSWORD = new char[0];
+        
     static final String DB_USER_TABLE = "users";
     static final String DB_STORY_TABLE = "stories";
     static final String DB_SERVE_EVENT_TABLE = "serve_events";
@@ -43,8 +30,15 @@ public abstract class DBBase {
     static final String DB_TAG_FIELD = "tags";
     static final String DB_INTEREST_FIELD = "interests_";
     
-    
     static void initDB() throws UnknownHostException{
+        if(System.getenv("NODE_ENV").equalsIgnoreCase("production")){
+            DB_HOST = "linus.mongohq.com";
+            DB_PORT = 10064;
+            DB_NAME = System.getenv("DB");
+            DB_USERNAME = System.getenv("DB_USER");
+            DB_PASSWORD = System.getenv("DB_PASSWORD").toCharArray();
+        }
+
         mongoClient = new MongoClient(DB_HOST, DB_PORT);
         db = mongoClient.getDB(DB_NAME);
         if(!db.isAuthenticated()){
