@@ -44,11 +44,11 @@ public class DBServeEvent extends DBBase{
         try {
             while (cursor.hasNext()) {
                 DBObject obj = cursor.next();
-                if(!serves.containsKey((String) obj.get(DB_UID_FIELD))){
+                if(!serves.containsKey(obj.get(DB_UID_FIELD))){
                     serves.put((String) obj.get(DB_UID_FIELD), new ArrayList<ServeEvent>());
                 }
                 
-                serves.get((String) obj.get(DB_UID_FIELD)).add(new ServeEvent((String) obj.get("story_id"),
+                serves.get(obj.get(DB_UID_FIELD)).add(new ServeEvent((String) obj.get("story_id"),
                         (String) obj.get(DB_UID_FIELD), (String) obj.get(DB_TAG_FIELD),
                         (Integer) obj.get("timespend")));
             }

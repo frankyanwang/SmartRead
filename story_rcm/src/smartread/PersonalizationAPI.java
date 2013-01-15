@@ -15,7 +15,7 @@ import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.LogManager;
 
 public class PersonalizationAPI {
-    private static final Logger logger = LogManager.getLogger(PersonalizationAPI.class);
+    private static final Logger logger = LogManager.getLogger(PersonalizationAPI.class);  
     
     public List<Story> getUserStory(String uid) {
         Long starttime = System.currentTimeMillis();
@@ -28,21 +28,29 @@ public class PersonalizationAPI {
         return calcualte(user, stories);
     }
 
-    public Set<String> updateUserInterests(int lookbackMinute) {
+    public void updateUserInterests(String freq) {
+        if(freq.equalsIgnoreCase("1h")){
+            DBUser.updateUserInterest("1h","5m");
+        }else if(freq.equalsIgnoreCase("1d")){
+            DBUser.updateUserInterest("1d","1h");            
+        }else if(freq.equalsIgnoreCase("7d")){
+            DBUser.updateUserInterest("7d","1d");
+        }else{
+            logger.error("Invalid update frequency");
+        }
+    }
+    
+    public Set<String> updateUserInterestsRaw(int lookbackMinute) {
         Long starttime = System.currentTimeMillis();
-        Map<String, List<ServeEvent>> serves = DBServeEvent.QueryEvents(lookbackMinute);
         String freq;
         if(lookbackMinute==5)
             freq = "5m";
-        else if(lookbackMinute==60)
-            freq = "1h";
-        else if(lookbackMinute==60*24)
-            freq = "1d";
-        else if(lookbackMinute==60*24*7)
-            freq = "7d";
         else{
+            logger.error("Only query raw events for freq 5m");
             return null;
         }
+        
+        Map<String, List<ServeEvent>> serves = DBServeEvent.QueryEvents(lookbackMinute);
         
         for (String uid : serves.keySet()) {
             Map<List<String>, Double> tags = new HashMap<List<String>, Double>();
@@ -91,8 +99,20 @@ public class PersonalizationAPI {
         int freq = Integer.parseInt(args[0]);
         
         PersonalizationAPI api = new PersonalizationAPI();
+        Set<String> updatedUsers = null;
 
-        Set<String> updatedUsers = api.updateUserInterests(freq);
+        switch(freq){
+            case 5: updatedUsers = api.updateUserInterestsRaw(freq);
+                break;
+            case 60: api.updateUserInterests("1h");
+                break;
+            case 60*24: api.updateUserInterests("1d");
+                break;
+            case 60*24*7: api.updateUserInterests("7d");
+                break;
+            default: logger.error("Invalid update frequency");
+                break;
+        }
 
         if (updatedUsers != null) {
             for (String uid : updatedUsers) {

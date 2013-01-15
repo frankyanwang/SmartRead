@@ -38,6 +38,7 @@ public class Story {
         this.storyID = storyID;
     }
 
+    @Override
     public String toString() {
         return "StoryID: " + storyID + "\nScore: " + score + "\nTags: "
                 + tags.toString();

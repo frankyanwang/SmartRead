@@ -31,6 +31,7 @@ public class User {
         interests.put(tag, score);
     }
 
+    @Override
     public String toString() {
         return "User ID: " + uid + "\nInterests: " + interests.toString();
     }

@@ -12,6 +12,7 @@ import smartread.User;
 
 import com.mongodb.BasicDBObject;
 import com.mongodb.DBCollection;
+import com.mongodb.DBCursor;
 import com.mongodb.DBObject;
 
 public class DBUser extends DBBase{
@@ -81,7 +82,11 @@ public class DBUser extends DBBase{
 
         DBObject query = new BasicDBObject(DB_UID_FIELD, uid);
         
-        BasicDBObject interestsDB = new BasicDBObject();
+        
+        DBObject userInfo = coll.findOne(query);
+        String interest_info = DB_INTEREST_FIELD+freq;
+        BasicDBObject interestsDB = (BasicDBObject) userInfo.get(interest_info);
+        
         for (List<String> key : tags.keySet()) {
             Double score = tags.get(key);
 
@@ -96,8 +101,55 @@ public class DBUser extends DBBase{
         }
         
         coll.update(query, new BasicDBObject().append("$set", 
-                new BasicDBObject().append("interests_"+freq, interestsDB).append("last_update", System.currentTimeMillis())));
+                new BasicDBObject().append(DB_INTEREST_FIELD+freq, interestsDB).append("last_update", System.currentTimeMillis())));
         Long endtime = System.currentTimeMillis();
         logger.debug("Time(ms) taken to update interests for user "+uid+": "+ String.valueOf(endtime-starttime));
+    }
+
+    public static void updateUserInterest(String freq_now, String freq_pre) {
+        Long starttime = System.currentTimeMillis();
+
+        if(mongoClient == null){
+            try {
+                initDB();
+            } catch (UnknownHostException e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+                return;
+            }
+        }
+
+        DBCollection coll = db.getCollection(DB_USER_TABLE);
+
+        DBObject query = new BasicDBObject(DB_INTEREST_FIELD+freq_pre, new BasicDBObject("$ne", new BasicDBObject()));
+        
+        DBCursor cursor = coll.find(query);
+
+        try {
+            while(cursor.hasNext()) {
+                DBObject user = cursor.next();
+                BasicDBObject interests_pre = (BasicDBObject) user.get(DB_INTEREST_FIELD+freq_pre);
+                BasicDBObject interests_now = (BasicDBObject) user.get(DB_INTEREST_FIELD+freq_now);
+                
+                for(String tag: interests_pre.keySet()){
+                    Double score_pre = (Double) interests_pre.get(tag);
+                    Double score_now = (Double) interests_now.get(tag);
+                    if(score_now == null){
+                        interests_now.append(tag, score_pre);
+                    }else{
+                        interests_now.put(tag, score_now+score_pre);
+                    }
+                }
+                
+                coll.update(new BasicDBObject(DB_UID_FIELD, user.get(DB_UID_FIELD)) , new BasicDBObject().append("$set", 
+                        new BasicDBObject().append(DB_INTEREST_FIELD+freq_now, interests_now).append(DB_INTEREST_FIELD+freq_pre, new BasicDBObject())));
+            }
+        } finally {
+            cursor.close();
+        }
+
+        
+        Long endtime = System.currentTimeMillis();
+        logger.debug("Time(ms) taken to update interests for freq "+freq_now+": "+ String.valueOf(endtime-starttime));
     }
 }
