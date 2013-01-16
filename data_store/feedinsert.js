@@ -77,6 +77,9 @@ function parseFeed(feedurl, dataProvider, category) {
                             var tags = _.union([category],article.categories);
                             //console.log(tags);
 
+                            //console.log(meta.link + "\n\n\n")
+                            var content = contentFilter(article.description, meta.link);
+
                             collection.update({
                                 guid:article.guid
                             }, {
@@ -84,8 +87,9 @@ function parseFeed(feedurl, dataProvider, category) {
                                 source:meta.title,
                                 name:article.title,
                                 link:article.link,
-                                description:cheerio.load(article.description)('p').text(),
-                                content:article.description,
+                                description:content.summary,
+                                content:content.body,
+                                wordcount:content.wordcount,
                                 pubDate:article.pubdate,
                                 date:article.date,
                                 guid:article.guid,
@@ -98,6 +102,7 @@ function parseFeed(feedurl, dataProvider, category) {
                             }, function () {
                                 console.log(id + " with url=" + article.guid + " successfully inserted or updated!");
                             });
+
 
                             // getTags(article.link, function(keywords){
                             // 	console.log("curent id is " +id + ", and tags is " + keywords);
@@ -136,4 +141,58 @@ function storeImage(filename, imgurl) {
             console.log('image ' + filename + ' inserted into gridstore.');
         });
     });
+}
+
+
+function contentFilter(html, link) {
+
+    switch(link){
+
+        case 'http://www.ifanr.com':
+            var content = cheerio.load(html);
+            var removable = cheerio.load(html);
+            removable('p').last().replaceWith('')
+            return {
+                summary: content('p').text(),
+                body: removable.html('p'),
+                wordcount: content('p').text().length
+            }
+            break;
+        case 'http://tech2ipo.com/feed':
+            var content = cheerio.load(html);
+            return {
+                summary: content('p').text(),
+                body: content.html('p'),
+                wordcount: content('p').text().length
+            }
+            break;
+        case 'http://www.36kr.com/':
+            var content = cheerio.load(html);
+            var removable = cheerio.load(html);
+            removable('p').last().replaceWith('')
+            return {
+                summary: content('p').text(),
+                body: removable.html('p'),
+                wordcount: content('p').text().length
+            }
+            break;
+        case 'http://www.fashiondes.com/':
+            var content = cheerio.load(html);
+            var children = content('p').children().text();
+            return {
+                summary: children ? children : content('p').text() ,
+                body: content.html(),
+                wordcount: children ? children.length : content('p').text().length
+            }
+            break;
+        default :
+            var content = cheerio.load(html);
+            //console.log("%%%%%%%" + content.html() + "%%%%%%%\n")
+            return {
+                summary: content('p').text(),
+                body: content.html('p'),
+                wordcount: content('p').text().length
+            }
+            break;
+    }
 }
