@@ -47,7 +47,9 @@ function getTags(link, fn) {
 
 function parseFeed(feedurl, dataProvider, category) {
 
-    request(feedurl, function (error, response, body) {
+    request({ uri: feedurl,
+              timeout: 120000
+    }, function (error, response, body) {
 
         if (!error && response.statusCode == 200) {
 
@@ -126,6 +128,9 @@ function parseFeed(feedurl, dataProvider, category) {
                     console.log("close db connection");
                 }
             });
+        } else{
+            dataProvider.db.close();
+            console.log("request failed.");
         }
     });
 }

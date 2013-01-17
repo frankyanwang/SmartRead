@@ -24,21 +24,6 @@ module.exports = {
         //open the db connection and then authenticate
         this.db.open(function(err) {
 
-            _parent.db.authenticate(
-                options.username,
-                options.password,
-               function(err) {
-                    if (err) {
-                        console.log(err);
-                    }else{
-                        console.log("Connected to 'smartreaddb' database");
-                        if(callback){
-                            callback();
-                        }
-                    }
-               }
-            );
-
             if(options.username !== undefined && options.username.length > 0){
                 _parent.db.authenticate(
                     options.username,
