@@ -19,6 +19,7 @@ public class DBUser extends DBBase{
     private static final Logger logger = LogManager.getLogger(DBUser.class);
 
     public static User retrieveUser(String uid) {
+        assert uid!=null && uid!="" : "User id should be empty or null";
         Long starttime = System.currentTimeMillis();
 
         if(mongoClient == null){
@@ -31,7 +32,7 @@ public class DBUser extends DBBase{
             }
         }
         
-        DBCollection coll = db.getCollection(DB_USER_TABLE);
+        DBCollection coll = db.getCollection(DB_USER_INTEREST_TABLE);
 
         DBObject obj = new BasicDBObject(DB_UID_FIELD, uid);
         DBObject userInfo = coll.findOne(obj);
@@ -78,7 +79,7 @@ public class DBUser extends DBBase{
             }
         }
 
-        DBCollection coll = db.getCollection(DB_USER_TABLE);
+        DBCollection coll = db.getCollection(DB_USER_INTEREST_TABLE);
 
         DBObject query = new BasicDBObject(DB_UID_FIELD, uid);
         
@@ -119,7 +120,7 @@ public class DBUser extends DBBase{
             }
         }
 
-        DBCollection coll = db.getCollection(DB_USER_TABLE);
+        DBCollection coll = db.getCollection(DB_USER_INTEREST_TABLE);
 
         DBObject query = new BasicDBObject(DB_INTEREST_FIELD+freq_pre, new BasicDBObject("$ne", new BasicDBObject()));
         

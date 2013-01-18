@@ -26,7 +26,6 @@ public class DBServeEvent extends DBBase{
             try {
                 initDB();
             } catch (UnknownHostException e) {
-                // TODO Auto-generated catch block
                 e.printStackTrace();
                 return null;
             }
@@ -36,7 +35,7 @@ public class DBServeEvent extends DBBase{
         Long time = current - min * 60 * 1000;
 
         DBCollection coll = db.getCollection(DB_SERVE_EVENT_TABLE);
-        BasicDBObject query = new BasicDBObject("timestamp", new BasicDBObject(
+        BasicDBObject query = new BasicDBObject(DB_EVENT_TIME_CREATE_FIELD, new BasicDBObject(
                 "$gt", time));
         DBCursor cursor = coll.find(query);
 
@@ -50,7 +49,7 @@ public class DBServeEvent extends DBBase{
                 
                 serves.get(obj.get(DB_UID_FIELD)).add(new ServeEvent((String) obj.get("story_id"),
                         (String) obj.get(DB_UID_FIELD), (String) obj.get(DB_TAG_FIELD),
-                        (Integer) obj.get("timespend")));
+                        (Integer) obj.get(DB_EVENT_TIME_SPEND_FIELD)));
             }
         } finally {
             cursor.close();

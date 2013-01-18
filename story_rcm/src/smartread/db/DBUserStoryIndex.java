@@ -25,7 +25,7 @@ public class DBUserStoryIndex extends DBBase{
         for(Story s: stories){
             storyIndex.append(s.getStoryID(), s.getScore());
         }
-        userStories.append("index", storyIndex);
+        userStories.append(DB_INDEX_FIELD, storyIndex);
         
         DBCollection coll = db.getCollection(DB_USER_STORY_TABLE);
         DBObject query = new BasicDBObject(DB_UID_FIELD, uid);
