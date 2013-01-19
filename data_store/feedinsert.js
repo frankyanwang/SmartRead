@@ -1,12 +1,13 @@
-var _ = require('underscore');
-var Utils = require('../server/server_utils');
+var _       = require('underscore');
+var Utils   = require('../server/server_utils');
 
-var feedparser = require('feedparser'),
-    cheerio = require('cheerio'),
-    request = require('request'),
-    mongo = require('mongodb'),
-    gridstore = mongo.GridStore,
-    config = require('./config.js');
+var feedparser  = require('feedparser'),
+    cheerio     = require('cheerio'),
+    request     = require('request'),
+    mongo       = require('mongodb'),
+    gridstore   = mongo.GridStore,
+    config      = require('./config.js'),
+    XMLHttpRequest = require("xmlhttprequest").XMLHttpRequest;
 
 var Iconv  = require('iconv-jp').Iconv;
 
@@ -43,7 +44,7 @@ _.each(config.baidu_feeds, function (value, key) {
         if(err){
             console.log(err, " Exit!");
         }else{
-            parseFeedBaidu(key, dataProvider, value);
+            parseFeedBaidu(key, dataProvider, value.split(', '));
             console.log(value, key);
         }
     });
@@ -136,6 +137,7 @@ function parseFeed(feedurl, dataProvider, category) {
             dataProvider.db.close();
             console.log("request failed.");
             console.log("close db connection");
+
         }
     });
 }
@@ -169,7 +171,11 @@ function parseFeedBaidu(feedurl, dataProvider, category) {
                                 var $ = cheerio.load(article.description);
                                 var imageUrl = getImageUrl($);
 
+
                                 if(imageUrl === undefined){
+                                    return false;
+                                }
+                                if(UrlBroken(imageUrl)){
                                     return false;
                                 }
 
@@ -197,7 +203,7 @@ function parseFeedBaidu(feedurl, dataProvider, category) {
                                 }, {
                                     upsert:true
                                 }, function () {
-                                    console.log(id + " with url=" + article.guid + " successfully inserted or updated!");
+                                    console.log(id + " with url=" + article.guid + " successfully inserted!");
                                 });
 
                             });
@@ -326,4 +332,11 @@ function getCleanDescription($,article){
     description = description.split('...')[0] + "... [更多]";
 
     return description;
+}
+
+function UrlBroken(url) {
+    var http = new XMLHttpRequest();
+    http.open('HEAD', url, false);
+    http.send();
+    return http.status != 200;
 }
