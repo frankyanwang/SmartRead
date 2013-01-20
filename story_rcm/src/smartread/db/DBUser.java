@@ -11,9 +11,11 @@ import org.apache.logging.log4j.Logger;
 import smartread.User;
 
 import com.mongodb.BasicDBObject;
+import com.mongodb.DB;
 import com.mongodb.DBCollection;
 import com.mongodb.DBCursor;
 import com.mongodb.DBObject;
+import com.mongodb.MongoClient;
 
 public class DBUser extends DBBase{
     private static final Logger logger = LogManager.getLogger(DBUser.class);
@@ -85,6 +87,9 @@ public class DBUser extends DBBase{
         
         
         DBObject userInfo = coll.findOne(query);
+        if(userInfo==null){
+            userInfo = initUserInterest(uid);
+        }
         String interest_info = DB_INTEREST_FIELD+freq;
         BasicDBObject interestsDB = (BasicDBObject) userInfo.get(interest_info);
         
@@ -105,6 +110,17 @@ public class DBUser extends DBBase{
                 new BasicDBObject().append(DB_INTEREST_FIELD+freq, interestsDB).append("last_update", System.currentTimeMillis())));
         Long endtime = System.currentTimeMillis();
         logger.debug("Time(ms) taken to update interests for user "+uid+": "+ String.valueOf(endtime-starttime));
+    }
+
+    private static BasicDBObject initUserInterest(String uid) {
+        DBCollection coll = db.getCollection(DBBase.DB_USER_INTEREST_TABLE);
+        BasicDBObject doc = new BasicDBObject(DBBase.DB_UID_FIELD, uid)
+                .append("interests_5m", new BasicDBObject())
+                .append("interests_1h", new BasicDBObject())
+                .append("interests_1d", new BasicDBObject())
+                .append("interests_7d", new BasicDBObject());
+        coll.insert(doc);
+        return doc;
     }
 
     public static void updateUserInterest(String freq_now, String freq_pre) {

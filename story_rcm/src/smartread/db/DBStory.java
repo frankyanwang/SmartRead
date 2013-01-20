@@ -44,7 +44,11 @@ public class DBStory extends DBBase{
                 Double score = Double.valueOf(obj.get(DB_SCORE_FIELD).toString());
                 String id = obj.get(DB_OID_FIELD).toString();
                 List<String> tags = new ArrayList<String>();
-                tags.add((String) obj.get(DB_CATEGORY_FIELD));
+                
+                BasicDBList tagList = (BasicDBList) obj.get(DB_CATEGORY_FIELD);
+                for(Object o: tagList){
+                    tags.add(o.toString());
+                }
                 stories.add(new Story(id, score, tags));
             }
         } finally {
@@ -117,9 +121,12 @@ public class DBStory extends DBBase{
         
         DBObject story = coll.findOne(q);
         
-        Double score = Double.valueOf((String) story.get(DB_SCORE_FIELD));
+        Double score = (Double) story.get(DB_SCORE_FIELD);
         List<String> tags = new ArrayList<String>();
-        tags.add((String) story.get(DB_CATEGORY_FIELD));
+        BasicDBList tagList = (BasicDBList) story.get(DB_CATEGORY_FIELD);
+        for(Object o: tagList){
+            tags.add(o.toString());
+        }
         
         Long endtime = System.currentTimeMillis();
         logger.debug("Time(ms) taken to retrive story "+storyID+" from DB: "+ String.valueOf(endtime-starttime));
