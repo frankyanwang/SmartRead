@@ -11,6 +11,7 @@ import org.apache.logging.log4j.Logger;
 
 import smartread.ServeEvent;
 
+import com.mongodb.BasicDBList;
 import com.mongodb.BasicDBObject;
 import com.mongodb.DBCollection;
 import com.mongodb.DBCursor;
@@ -47,8 +48,8 @@ public class DBServeEvent extends DBBase{
                     serves.put((String) obj.get(DB_UID_FIELD), new ArrayList<ServeEvent>());
                 }
                 
-                serves.get(obj.get(DB_UID_FIELD)).add(new ServeEvent((String) obj.get("story_id"),
-                        (String) obj.get(DB_UID_FIELD), (String) obj.get(DB_TAG_FIELD),
+                serves.get(obj.get(DB_UID_FIELD)).add(new ServeEvent((String) obj.get("storyId"),
+                        (String) obj.get(DB_UID_FIELD), ((BasicDBList) obj.get(DB_TAG_FIELD)).toString(),
                         (Integer) obj.get(DB_EVENT_TIME_SPEND_FIELD)));
             }
         } finally {

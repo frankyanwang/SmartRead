@@ -34,7 +34,7 @@ public abstract class DBBase {
     static final String DB_TAG_FIELD = "tags";
     static final String DB_INTEREST_FIELD = "interests_";
     static final String DB_INDEX_FIELD = "index";
-    static final String DB_EVENT_TIME_CREATE_FIELD = "createTime";
+    static final String DB_EVENT_TIME_CREATE_FIELD = "createTimeLong";
     static final String DB_EVENT_TIME_SPEND_FIELD = "timespend";
     
     static void initDB() throws UnknownHostException{

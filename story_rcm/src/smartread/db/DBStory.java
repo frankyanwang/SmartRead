@@ -95,7 +95,7 @@ public class DBStory extends DBBase{
             cursor.close();
         }
         Long endtime = System.currentTimeMillis();
-        logger.debug("Time(ms) taken to retrive user from DB: "+ String.valueOf(endtime-starttime));
+        logger.debug("Time(ms) taken to update top stories in DB: "+ String.valueOf(endtime-starttime));
     }
     
     public static Story getStory(String storyID){
