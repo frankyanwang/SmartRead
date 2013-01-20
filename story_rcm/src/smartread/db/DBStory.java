@@ -84,13 +84,17 @@ public class DBStory extends DBBase{
             while (cursor.hasNext() && size<500) {
                 int matchedTag = 0;
                 DBObject obj = cursor.next();
+                Double score = Double.valueOf(obj.get(DB_SCORE_FIELD).toString());
                 BasicDBList tags = (BasicDBList) obj.get(DB_TAG_FIELD);
                 for(int i=0; i<tags.size(); i++){
                     String tag = (String) tags.get(i);
                     if (tagsColl.findOne(new BasicDBObject("name",tag)) != null)
                         matchedTag++;
                 }
-                obj.put(DB_SCORE_FIELD, DEFAULT_STORY_SCORE*(100+matchedTag)/100);
+                if(score == null){
+                    score = DEFAULT_STORY_SCORE;
+                }
+                obj.put(DB_SCORE_FIELD, score*(100+matchedTag)/100);
                 list.add(obj);
                 size++;
             }

@@ -11,11 +11,9 @@ import org.apache.logging.log4j.Logger;
 import smartread.User;
 
 import com.mongodb.BasicDBObject;
-import com.mongodb.DB;
 import com.mongodb.DBCollection;
 import com.mongodb.DBCursor;
 import com.mongodb.DBObject;
-import com.mongodb.MongoClient;
 
 public class DBUser extends DBBase{
     private static final Logger logger = LogManager.getLogger(DBUser.class);

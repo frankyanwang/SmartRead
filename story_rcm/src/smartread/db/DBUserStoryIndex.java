@@ -1,6 +1,7 @@
 package smartread.db;
 
 import java.net.UnknownHostException;
+import java.util.Collections;
 import java.util.List;
 
 import com.mongodb.BasicDBObject;
@@ -8,6 +9,7 @@ import com.mongodb.DBCollection;
 import com.mongodb.DBObject;
 
 import smartread.Story;
+import smartread.StoryComparator;
 
 public class DBUserStoryIndex extends DBBase{
     public static void storeUserStory(String uid, List<Story> stories){
@@ -19,9 +21,11 @@ public class DBUserStoryIndex extends DBBase{
                 e.printStackTrace();
             }
         }
+        Collections.sort(stories, new StoryComparator());
         
         BasicDBObject userStories = new BasicDBObject(DB_UID_FIELD,uid);
         BasicDBObject storyIndex = new BasicDBObject();
+        
         for(Story s: stories){
             storyIndex.append(s.getStoryID(), s.getScore());
         }
