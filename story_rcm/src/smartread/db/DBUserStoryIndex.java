@@ -4,6 +4,7 @@ import java.net.UnknownHostException;
 import java.util.Collections;
 import java.util.List;
 
+import com.mongodb.BasicDBList;
 import com.mongodb.BasicDBObject;
 import com.mongodb.DBCollection;
 import com.mongodb.DBObject;
@@ -25,11 +26,14 @@ public class DBUserStoryIndex extends DBBase{
         
         BasicDBObject userStories = new BasicDBObject(DB_UID_FIELD,uid);
         BasicDBObject storyIndex = new BasicDBObject();
+        BasicDBList storyList = new BasicDBList();
         
         for(Story s: stories){
             storyIndex.append(s.getStoryID(), s.getScore());
+            storyList.add(s.getStoryID());
         }
         userStories.append(DB_INDEX_FIELD, storyIndex);
+        userStories.append(DB_LIST_FIELD, storyList);
         
         DBCollection coll = db.getCollection(DB_USER_STORY_TABLE);
         DBObject query = new BasicDBObject(DB_UID_FIELD, uid);
