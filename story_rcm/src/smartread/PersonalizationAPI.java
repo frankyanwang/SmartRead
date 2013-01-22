@@ -1,6 +1,7 @@
 package smartread;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -80,9 +81,9 @@ public class PersonalizationAPI {
         if (interest.size() == 0)
             return stories;
 
-        for (Story s : stories) {
+        for (Story s: stories) {
             List<String> tags = s.getTags();
-            s.setScore(s.getScore()*Utils.evaluateInterest(interest, tags));
+            s.setNScore(s.getBScore()*Utils.evaluateInterest(interest, tags));
         }
         Long endtime = System.currentTimeMillis();
         logger.debug("Time(ms) taken to calculate story point for user "+user.getUid()+": "+ String.valueOf(endtime-starttime));
@@ -100,9 +101,15 @@ public class PersonalizationAPI {
         
         PersonalizationAPI api = new PersonalizationAPI();
         Set<String> updatedUsers = null;
-
         switch(freq){
             case 5: updatedUsers = api.updateUserInterestsRaw(freq);
+                api.updateUserStoryForAll();
+                //if (updatedUsers != null) {
+                //    for (String uid : updatedUsers) {
+                //        List<Story> stories = api.getUserStory(uid);
+                //         api.storeUserStory(uid, stories);
+                //    }
+                //}
                 break;
             case 60: api.updateUserInterests("1h");
                 break;
@@ -114,15 +121,34 @@ public class PersonalizationAPI {
                 break;
         }
 
-        if (updatedUsers != null) {
-            for (String uid : updatedUsers) {
-                List<Story> stories = api.getUserStory(uid);
-                api.storeUserStory(uid, stories);
-            }
+    }
+
+    private void updateUserStoryForAll() {
+        Long starttime = System.currentTimeMillis();
+        List<Story> stories = DBStory.retrieveDefaultStory();
+        timelineFactor(stories);
+        List<User> users = DBUser.retrieveAllUser();
+        for(User u: users){
+            storeUserStory(u.getUid(), calcualte(u, stories));
         }
+        Long endtime = System.currentTimeMillis();
+        logger.debug("Time(ms) taken to refresh all users' story score: "+ String.valueOf(endtime-starttime));        
     }
 
     private void storeUserStory(String uid, List<Story> stories) {
         DBUserStoryIndex.storeUserStory(uid, stories);
+    }
+    
+    private void timelineFactor(List<Story> stories){
+        Long starttime = System.currentTimeMillis();
+
+        Date date = new Date(System.currentTimeMillis());
+        for(Story s: stories){
+            Date sDate = s.getPubDate();
+            double factor = 1-(date.getTime()-sDate.getTime())/1000/60/60/24*0.05;
+            s.setBScore(s.getBScore()*factor);
+        }
+        Long endtime = System.currentTimeMillis();
+        logger.debug("Time(ms) taken to update story score based on timeline: "+ String.valueOf(endtime-starttime));                
     }
 }

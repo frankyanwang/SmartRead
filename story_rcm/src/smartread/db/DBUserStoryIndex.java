@@ -18,10 +18,10 @@ public class DBUserStoryIndex extends DBBase{
             try {
                 initDB();
             } catch (UnknownHostException e) {
-                // TODO Auto-generated catch block
                 e.printStackTrace();
             }
         }
+        
         Collections.sort(stories, new StoryComparator());
         
         BasicDBObject userStories = new BasicDBObject(DB_UID_FIELD,uid);
@@ -29,7 +29,7 @@ public class DBUserStoryIndex extends DBBase{
         BasicDBList storyList = new BasicDBList();
         
         for(Story s: stories){
-            storyIndex.append(s.getStoryID(), s.getScore());
+            storyIndex.append(s.getStoryID(), s.getNScore());
             storyList.add(s.getStoryID());
         }
         userStories.append(DB_INDEX_FIELD, storyIndex);
@@ -43,6 +43,5 @@ public class DBUserStoryIndex extends DBBase{
         }else{
             coll.update(query, userStories);
         }
-        
     }
 }

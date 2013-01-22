@@ -15,6 +15,7 @@ import com.mongodb.DBCollection;
 import com.mongodb.DBCursor;
 import com.mongodb.DBObject;
 import com.mongodb.WriteConcern;
+import com.mongodb.WriteResult;
 
 import smartread.Story;
 
@@ -28,7 +29,6 @@ public class DBStory extends DBBase{
             try {
                 initDB();
             } catch (UnknownHostException e) {
-                // TODO Auto-generated catch block
                 e.printStackTrace();
                 return null;
             }
@@ -43,13 +43,14 @@ public class DBStory extends DBBase{
                 DBObject obj = cursor.next();
                 Double score = Double.valueOf(obj.get(DB_SCORE_FIELD).toString());
                 String id = obj.get(DB_OID_FIELD).toString();
+                Date date = (Date) obj.get("pubDate");
                 List<String> tags = new ArrayList<String>();
                 
                 BasicDBList tagList = (BasicDBList) obj.get(DB_CATEGORY_FIELD);
                 for(Object o: tagList){
                     tags.add(o.toString());
                 }
-                stories.add(new Story(id, score, tags));
+                stories.add(new Story(id, score, tags, date));
             }
         } finally {
             cursor.close();
@@ -58,7 +59,9 @@ public class DBStory extends DBBase{
         logger.debug("Time(ms) taken to retrive default stories from DB: "+ String.valueOf(endtime-starttime));
         return stories;
     }
-
+    private static int TOP_STORY_SIZE = 3500;
+    private static int LOOKBACK_DAYS = 7;
+    
     public static void updateTopStory(){
         Long starttime = System.currentTimeMillis();
 
@@ -66,7 +69,6 @@ public class DBStory extends DBBase{
             try {
                 initDB();
             } catch (UnknownHostException e) {
-                // TODO Auto-generated catch block
                 e.printStackTrace();
             }
         }
@@ -74,14 +76,14 @@ public class DBStory extends DBBase{
         DBCollection topStoryColl = db.getCollection(DB_TOP_STORY_TABLE);
         DBCollection tagsColl = db.getCollection(DB_TAGS_TABLE);
     
-        Date date = new Date(System.currentTimeMillis()-1000*60*60*24*7);
+        Date date = new Date(System.currentTimeMillis()-1000*60*60*24*LOOKBACK_DAYS);
         BasicDBObject query  = new BasicDBObject("pubDate", new BasicDBObject("$gte", date));
-        DBCursor cursor = storyColl.find(query).sort(new BasicDBObject("pubDate", -1));
+        DBCursor cursor = storyColl.find(query).sort(new BasicDBObject("score", -1)).sort(new BasicDBObject("pubDate", -1));
         
         try {
             List<DBObject> list = new ArrayList<DBObject>();
             int size = 0;
-            while (cursor.hasNext() && size<500) {
+            while (cursor.hasNext() && size<TOP_STORY_SIZE) {
                 int matchedTag = 0;
                 DBObject obj = cursor.next();
                 Double score = Double.valueOf(obj.get(DB_SCORE_FIELD).toString());
@@ -106,6 +108,30 @@ public class DBStory extends DBBase{
         logger.debug("Time(ms) taken to update top stories in DB: "+ String.valueOf(endtime-starttime));
     }
     
+    public static void cleanUpTopStory(){
+        Long starttime = System.currentTimeMillis();
+
+        DBCollection topStoryColl = db.getCollection(DB_TOP_STORY_TABLE);
+        Date date = new Date(System.currentTimeMillis()-1000*60*60*24*LOOKBACK_DAYS);
+        DBObject query = new BasicDBObject("pubDate", new BasicDBObject("$lt", date));
+        WriteResult wr = topStoryColl.remove(query);
+        logger.info(wr.toString());
+        
+        DBCursor cursor = topStoryColl.find().sort(new BasicDBObject("score", -1).append("pubDate", -1));
+        if(cursor.size()<=TOP_STORY_SIZE)
+            return;
+        cursor = cursor.skip(TOP_STORY_SIZE);
+        DBObject obj = cursor.next();
+        date = (Date) obj.get("pubDate");
+        Double score = (Double) obj.get("score");
+        query = new BasicDBObject("pubDate", new BasicDBObject("$lt", date)).append("score", new BasicDBObject("$lt", score));
+        wr = topStoryColl.remove(query);
+        logger.info(wr.toString());
+        
+        Long endtime = System.currentTimeMillis();
+        logger.debug("Time(ms) taken to clean up top stories in DB: "+ String.valueOf(endtime-starttime));
+    }
+    
     public static Story getStory(String storyID){
         Long starttime = System.currentTimeMillis();
 
@@ -113,7 +139,6 @@ public class DBStory extends DBBase{
             try {
                 initDB();
             } catch (UnknownHostException e) {
-                // TODO Auto-generated catch block
                 e.printStackTrace();
                 return null;
             }
@@ -126,6 +151,7 @@ public class DBStory extends DBBase{
         DBObject story = coll.findOne(q);
         
         Double score = (Double) story.get(DB_SCORE_FIELD);
+        Date date = (Date) story.get("pubDate");
         List<String> tags = new ArrayList<String>();
         BasicDBList tagList = (BasicDBList) story.get(DB_CATEGORY_FIELD);
         for(Object o: tagList){
@@ -135,10 +161,11 @@ public class DBStory extends DBBase{
         Long endtime = System.currentTimeMillis();
         logger.debug("Time(ms) taken to retrive story "+storyID+" from DB: "+ String.valueOf(endtime-starttime));
 
-        return new Story(storyID, score, tags);
+        return new Story(storyID, score, tags, date);
     }
     
     public static void main(String args[]) {
         DBStory.updateTopStory();
+        DBStory.cleanUpTopStory();
     }
 }

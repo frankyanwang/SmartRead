@@ -1,6 +1,7 @@
 package smartread.db;
 
 import java.net.UnknownHostException;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -26,7 +27,6 @@ public class DBUser extends DBBase{
             try {
                 initDB();
             } catch (UnknownHostException e) {
-                // TODO Auto-generated catch block
                 e.printStackTrace();
                 return null;
             }
@@ -73,7 +73,6 @@ public class DBUser extends DBBase{
             try {
                 initDB();
             } catch (UnknownHostException e) {
-                // TODO Auto-generated catch block
                 e.printStackTrace();
                 return;
             }
@@ -166,5 +165,53 @@ public class DBUser extends DBBase{
         
         Long endtime = System.currentTimeMillis();
         logger.debug("Time(ms) taken to update interests for freq "+freq_now+": "+ String.valueOf(endtime-starttime));
+    }
+
+    
+    public static List<User> retrieveAllUser() {
+        Long starttime = System.currentTimeMillis();
+        if(mongoClient == null){
+            try {
+                initDB();
+            } catch (UnknownHostException e) {
+                e.printStackTrace();
+                return null;
+            }
+        }
+        
+        DBCollection coll = db.getCollection(DB_USER_INTEREST_TABLE);
+        DBCursor cursor = coll.find();
+        List<User> users = new ArrayList<User>();
+        try {
+            while(cursor.hasNext()) {
+                DBObject userInfo = cursor.next();
+                Map<String, Double> maps = new HashMap<String, Double>();
+                DBObject interests;
+
+                String[] int_info = { "interests_5m", "interests_1h", "interests_1d", "interests_7d" };
+                for (String s : int_info) {
+                    interests = (DBObject) userInfo.get(s);
+                    for (String key : interests.keySet()) {
+                        if (maps.containsKey(key)) {
+                            maps.put(
+                                    key,
+                                    maps.get(key)
+                                            + Double.valueOf(interests.get(key)
+                                                    .toString()));
+                        } else {
+                            maps.put(key, Double.valueOf(interests.get(key).toString()));
+                        }
+                    }
+                }
+                users.add(new User((String) userInfo.get(DB_UID_FIELD), maps));
+            }
+        } finally {
+            cursor.close();
+        }
+
+        
+        Long endtime = System.currentTimeMillis();
+        logger.debug("Time(ms) taken to retrieve all users: "+ String.valueOf(endtime-starttime));
+        return users;
     }
 }
