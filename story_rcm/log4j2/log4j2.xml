@@ -6,9 +6,9 @@
     </Console>
   </appenders>
   <loggers>
-    <logger name="smartread.PersonalizationAPI" level="trace">
+    <logger name="smartread.PersonalizationAPI" level="debug">
     </logger>    
-    <root level="trace">
+    <root level="debug">
       <appender-ref ref="Console"/>
     </root>
   </loggers>
