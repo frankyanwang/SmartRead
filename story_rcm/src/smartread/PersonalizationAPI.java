@@ -44,7 +44,7 @@ public class PersonalizationAPI {
     public Set<String> updateUserInterestsRaw(int lookbackMinute) {
         Long starttime = System.currentTimeMillis();
         String freq;
-        if(lookbackMinute==5)
+        if(lookbackMinute==5||lookbackMinute==10)
             freq = "5m";
         else{
             logger.error("Only query raw events for freq 5m");
@@ -97,12 +97,12 @@ public class PersonalizationAPI {
             logger.error("Please input the update freq in minuts");
             return;
         }
-        int freq = Integer.parseInt(args[0]);
+        int lookbackMinute = Integer.parseInt(args[0]);
         
         PersonalizationAPI api = new PersonalizationAPI();
         Set<String> updatedUsers = null;
-        switch(freq){
-            case 5: updatedUsers = api.updateUserInterestsRaw(freq);
+        switch(lookbackMinute){
+            case 5: case 10: updatedUsers = api.updateUserInterestsRaw(lookbackMinute);
                 api.updateUserStoryForAll();
                 //if (updatedUsers != null) {
                 //    for (String uid : updatedUsers) {
@@ -145,7 +145,8 @@ public class PersonalizationAPI {
         Date date = new Date(System.currentTimeMillis());
         for(Story s: stories){
             Date sDate = s.getPubDate();
-            double factor = 1-(date.getTime()-sDate.getTime())/1000/60/60/24*0.05;
+            double factor = 1-(date.getTime()-sDate.getTime())*0.05/1000/60/60/24;
+            logger.trace("Timeline factor for story "+s.getStoryID()+"is "+factor);
             s.setBScore(s.getBScore()*factor);
         }
         Long endtime = System.currentTimeMillis();
