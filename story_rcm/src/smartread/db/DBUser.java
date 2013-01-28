@@ -19,7 +19,7 @@ import com.mongodb.DBObject;
 public class DBUser extends DBBase{
     private static final Logger logger = LogManager.getLogger(DBUser.class);
 
-    public static User retrieveUser(String uid) {
+/*    public static User retrieveUser(String uid) {
         assert uid!=null && uid!="" : "User id should be empty or null";
         Long starttime = System.currentTimeMillis();
 
@@ -46,16 +46,25 @@ public class DBUser extends DBBase{
 
         String[] int_info = { "interests_5m", "interests_1h", "interests_1d", "interests_7d" };
         for (String s : int_info) {
+            double factor = 1.0;
+            if(s.equalsIgnoreCase("interests_1h")){
+                factor = 0.8;
+            }else if (s.equalsIgnoreCase("interests_1d")){
+                factor = 0.6;
+            }else if (s.equalsIgnoreCase("interests_7d")){
+                factor = 0.4;
+            }
+            
             interests = (DBObject) userInfo.get(s);
             for (String key : interests.keySet()) {
                 if (maps.containsKey(key)) {
                     maps.put(
                             key,
                             maps.get(key)
-                                    + Double.valueOf(interests.get(key)
+                                    + factor*Double.valueOf(interests.get(key)
                                             .toString()));
                 } else {
-                    maps.put(key, Double.valueOf(interests.get(key).toString()));
+                    maps.put(key, factor*Double.valueOf(interests.get(key).toString()));
                 }
             }
         }
@@ -65,7 +74,7 @@ public class DBUser extends DBBase{
 
         return new User((String) userInfo.get(DB_UID_FIELD), maps);
     }
-
+*/
     public static void updateUserInterest(String uid, String freq, Map<List<String>, Double> tags) {
         Long starttime = System.currentTimeMillis();
 
@@ -191,15 +200,24 @@ public class DBUser extends DBBase{
                 String[] int_info = { "interests_5m", "interests_1h", "interests_1d", "interests_7d" };
                 for (String s : int_info) {
                     interests = (DBObject) userInfo.get(s);
+                    double factor = 1.0;
+                    if(s.equalsIgnoreCase("interests_1h")){
+                        factor = 0.8;
+                    }else if (s.equalsIgnoreCase("interests_1d")){
+                        factor = 0.5;
+                    }else if (s.equalsIgnoreCase("interests_7d")){
+                        factor = 0.2;
+                    }
+                    
                     for (String key : interests.keySet()) {
                         if (maps.containsKey(key)) {
                             maps.put(
                                     key,
                                     maps.get(key)
-                                            + Double.valueOf(interests.get(key)
+                                            + factor*Double.valueOf(interests.get(key)
                                                     .toString()));
                         } else {
-                            maps.put(key, Double.valueOf(interests.get(key).toString()));
+                            maps.put(key, factor*Double.valueOf(interests.get(key).toString()));
                         }
                     }
                 }

@@ -18,7 +18,7 @@ import org.apache.logging.log4j.LogManager;
 public class PersonalizationAPI {
     private static final Logger logger = LogManager.getLogger(PersonalizationAPI.class);  
     
-    public List<Story> getUserStory(String uid) {
+/*    public List<Story> getUserStory(String uid) {
         Long starttime = System.currentTimeMillis();
         List<Story> stories = DBStory.retrieveDefaultStory();
         User user = DBUser.retrieveUser(uid);
@@ -28,7 +28,7 @@ public class PersonalizationAPI {
         
         return calcualte(user, stories);
     }
-
+*/
     public void updateUserInterests(String freq) {
         if(freq.equalsIgnoreCase("1h")){
             DBUser.updateUserInterest("1h","5m");
