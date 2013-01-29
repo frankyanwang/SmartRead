@@ -41,7 +41,7 @@ public class ExtractTags {
     public static void main(String[] args) {
         ExtractTags et = new ExtractTags();
         
-        String str = "史玉柱：创业者要坚强点 没有过不去的坎(图)";
+        String str = "两性养生：女人初夜后的得与失（组图）";
         List<String> tags = et.getTags(str);
         for(String s:tags)
             System.out.println(s);

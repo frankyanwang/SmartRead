@@ -129,13 +129,14 @@ public class DBStory extends DBBase{
         }
         
         DBCollection topStoryColl = db.getCollection(DB_TOP_STORY_TABLE);
-        logger.debug("Total top stories: "+topStoryColl.count());
+        logger.debug("Total top stories before clean up: "+topStoryColl.count());
         
         //remove stories are older than 7 days
         Date date = new Date(System.currentTimeMillis()-1000*60*60*24*LOOKBACK_DAYS);
         DBObject query = new BasicDBObject("pubDate", new BasicDBObject("$lt", date));
         topStoryColl.remove(query);
-        
+        logger.debug("Total top stories after clean up 7 days old: "+topStoryColl.count());
+
         //remove stories over the TOP_STORY_SIZE
         DBCursor cursor = topStoryColl.find().sort(new BasicDBObject("score", -1).append("pubDate", -1));
         try{
@@ -145,11 +146,13 @@ public class DBStory extends DBBase{
                 date = (Date) obj.get("pubDate");
                 Double score = (Double) obj.get("score");
                 query = new BasicDBObject("pubDate", new BasicDBObject("$lt", date)).append("score", new BasicDBObject("$lt", score));
+                logger.debug("topStoryColl remove query: "+query);
                 topStoryColl.remove(query);
             }
         } finally {
             cursor.close();
         }
+        logger.debug("Total top stories after clean up maximum "+TOP_STORY_SIZE+" stories: "+topStoryColl.count());
         
         //remove duplicate
         List<DBObject> stories = topStoryColl.find().sort(new BasicDBObject("pubDate", 1)).toArray();
@@ -169,7 +172,7 @@ public class DBStory extends DBBase{
                 }
             }
         }
-        logger.debug("Total top stories: "+topStoryColl.count());
+        logger.debug("Total top stories after clean up duplicates: "+topStoryColl.count());
         Long endtime = System.currentTimeMillis();
         logger.debug("Time(ms) taken to clean up top stories in DB: "+ String.valueOf(endtime-starttime));
     }
