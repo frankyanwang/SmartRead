@@ -15,9 +15,9 @@ import com.mongodb.DBCollection;
 import com.mongodb.DBCursor;
 import com.mongodb.DBObject;
 import com.mongodb.WriteConcern;
-import com.mongodb.WriteResult;
 
 import smartread.Story;
+import smartread.tag.ExtractTags;
 
 public class DBStory extends DBBase{
     private static final Logger logger = LogManager.getLogger(DBStory.class);
@@ -80,6 +80,8 @@ public class DBStory extends DBBase{
         BasicDBObject query  = new BasicDBObject("pubDate", new BasicDBObject("$gte", date));
         DBCursor cursor = storyColl.find(query).sort(new BasicDBObject("score", -1)).sort(new BasicDBObject("pubDate", -1));
         
+        ExtractTags et = new ExtractTags(); 
+        
         try {
             List<DBObject> list = new ArrayList<DBObject>();
             int size = 0;
@@ -88,6 +90,14 @@ public class DBStory extends DBBase{
                 DBObject obj = cursor.next();
                 Double score = Double.valueOf(obj.get(DB_SCORE_FIELD).toString());
                 BasicDBList tags = (BasicDBList) obj.get(DB_TAG_FIELD);
+                if(tags.size()<=5){
+                    List<String> newTags = et.getTags((String) obj.get("name"));
+                    for(String s:newTags){
+                        if(!tags.contains(s))
+                            tags.add(s);
+                    }
+                }    
+                
                 for(int i=0; i<tags.size(); i++){
                     String tag = (String) tags.get(i);
                     if (tagsColl.findOne(new BasicDBObject("name",tag)) != null)
@@ -110,28 +120,82 @@ public class DBStory extends DBBase{
     
     public static void cleanUpTopStory(){
         Long starttime = System.currentTimeMillis();
-
+        if(mongoClient == null){
+            try {
+                initDB();
+            } catch (UnknownHostException e) {
+                e.printStackTrace();
+            }
+        }
+        
         DBCollection topStoryColl = db.getCollection(DB_TOP_STORY_TABLE);
+        logger.debug("Total top stories: "+topStoryColl.count());
+        
+        //remove stories are older than 7 days
         Date date = new Date(System.currentTimeMillis()-1000*60*60*24*LOOKBACK_DAYS);
         DBObject query = new BasicDBObject("pubDate", new BasicDBObject("$lt", date));
-        WriteResult wr = topStoryColl.remove(query);
-        logger.info(wr.toString());
+        topStoryColl.remove(query);
         
+        //remove stories over the TOP_STORY_SIZE
         DBCursor cursor = topStoryColl.find().sort(new BasicDBObject("score", -1).append("pubDate", -1));
-        if(cursor.size()<=TOP_STORY_SIZE)
-            return;
-        cursor = cursor.skip(TOP_STORY_SIZE);
-        DBObject obj = cursor.next();
-        date = (Date) obj.get("pubDate");
-        Double score = (Double) obj.get("score");
-        query = new BasicDBObject("pubDate", new BasicDBObject("$lt", date)).append("score", new BasicDBObject("$lt", score));
-        wr = topStoryColl.remove(query);
-        logger.info(wr.toString());
+        try{
+            if(cursor.size()>TOP_STORY_SIZE){
+                cursor = cursor.skip(TOP_STORY_SIZE);
+                DBObject obj = cursor.next();
+                date = (Date) obj.get("pubDate");
+                Double score = (Double) obj.get("score");
+                query = new BasicDBObject("pubDate", new BasicDBObject("$lt", date)).append("score", new BasicDBObject("$lt", score));
+                topStoryColl.remove(query);
+            }
+        } finally {
+            cursor.close();
+        }
         
+        //remove duplicate
+        List<DBObject> stories = topStoryColl.find().sort(new BasicDBObject("pubDate", 1)).toArray();
+        for(int i=0; i<stories.size();i++){
+            DBObject fStory = stories.get(i);
+            BasicDBList f_tags = (BasicDBList) fStory.get(DB_TAG_FIELD);
+            for(int j=i+1;j<stories.size();j++){
+                DBObject sStory = stories.get(j);
+
+                BasicDBList s_tags = (BasicDBList) sStory.get(DB_TAG_FIELD);
+                if(checkSimilar(f_tags, s_tags)>0.9){
+                        topStoryColl.remove(stories.remove(j));
+                        j--;
+                        logger.debug("These two stories are simiar:\n1: "+fStory.get("name")+"\n2: "+sStory.get("name"));
+                        logger.debug("Base story from top_stories: "+fStory.toString());
+                        logger.debug("Remove a similar story from top_stories: "+sStory.toString());
+                }
+            }
+        }
+        logger.debug("Total top stories: "+topStoryColl.count());
         Long endtime = System.currentTimeMillis();
         logger.debug("Time(ms) taken to clean up top stories in DB: "+ String.valueOf(endtime-starttime));
     }
     
+    private static double checkSimilar(BasicDBList fTags, BasicDBList sTags) {
+        double f_similarity = 0;
+        int f_count = 0;
+
+        if(fTags.size()<=3||sTags.size()<=3)
+            return 0;
+        
+        for(Object s: fTags){
+            if(sTags.contains(s)) f_count++;
+        }
+        f_similarity = 1.0*f_count/fTags.size();
+        
+        double s_similarity = 0;
+        int s_count = 0;
+        for(Object s: sTags){
+            if(fTags.contains(s)) s_count++;
+        }
+        s_similarity = 1.0*s_count/sTags.size();
+
+        return f_similarity>s_similarity?f_similarity:s_similarity;
+    }
+
     public static Story getStory(String storyID){
         Long starttime = System.currentTimeMillis();
 

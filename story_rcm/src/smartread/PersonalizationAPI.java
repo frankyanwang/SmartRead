@@ -100,9 +100,8 @@ public class PersonalizationAPI {
         int lookbackMinute = Integer.parseInt(args[0]);
         
         PersonalizationAPI api = new PersonalizationAPI();
-        Set<String> updatedUsers = null;
         switch(lookbackMinute){
-            case 5: case 10: updatedUsers = api.updateUserInterestsRaw(lookbackMinute);
+            case 5: case 10: api.updateUserInterestsRaw(lookbackMinute);
                 api.updateUserStoryForAll();
                 //if (updatedUsers != null) {
                 //    for (String uid : updatedUsers) {
