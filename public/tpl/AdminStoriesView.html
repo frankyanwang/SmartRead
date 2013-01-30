@@ -5,6 +5,7 @@
             <th>Picture</th>
             <th>Title</th>
             <th>Description</th>
+            <th>Tags</th>
             <th>Score</th>
             <th>Operation</th>
             <th></th>
@@ -15,7 +16,8 @@
         <tr>
             <td><img id="picture" width="180" src="<%= story.picture %>"/></td>
             <td><%= story.name%></td>
-            <td><%= story.description%></td>
+            <td><%= story.description.substr(0,120) + "..."%></td>
+            <td><%= story.tags.toString().split(',').join(' ') %></td>
             <td><%= story.score%></td>
             <td>
                 <button data-id="<%= story._id%>" class="edit btn btn-primary">Edit</button>

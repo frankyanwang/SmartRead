@@ -76,7 +76,7 @@
                         <label for="tags" class="control-label">Tags:</label>
 
                         <div class="controls">
-                            <input id="tags" name="tags" type="text" value="<%= tags.toString() %>" />(No space in between. e.g. tag1,tag2,tag3)
+                            <input id="tags" name="tags" type="text" value="<%= tags.toString().split(',').join(' ') %>" />
                             <span class="help-inline"></span>
                         </div>
                     </div>

@@ -26,7 +26,7 @@ SR.PostView = Backbone.View.extend({
         var target = event.target;
         var change = {};
         if (target.name === "tags") {
-            var tags = target.value.split(",");
+            var tags = target.value.split(" ");
             change["tags"] = tags;
         } else{
             change[target.name] = target.value;
