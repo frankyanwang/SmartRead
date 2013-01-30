@@ -41,8 +41,15 @@ public class ExtractTags {
     public static void main(String[] args) {
         ExtractTags et = new ExtractTags();
         
-        String str = "两性养生：女人初夜后的得与失（组图）";
+        String str = "银行推专属理财“抢”年终奖";
+        System.out.println("Title: "+str);
         List<String> tags = et.getTags(str);
+        for(String s:tags)
+            System.out.println(s);
+        
+        str = "银行推专属理财“抢”年终奖(图)";
+        System.out.println("Title: "+str);
+        tags = et.getTags(str);
         for(String s:tags)
             System.out.println(s);
     }

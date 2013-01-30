@@ -163,7 +163,7 @@ public class DBStory extends DBBase{
                 DBObject sStory = stories.get(j);
 
                 BasicDBList s_tags = (BasicDBList) sStory.get(DB_TAG_FIELD);
-                if(checkSimilar(f_tags, s_tags)>0.9){
+                if(checkSimilar(f_tags, s_tags)>=0.8){
                         topStoryColl.remove(stories.remove(j));
                         j--;
                         logger.debug("These two stories are simiar:\n1: "+fStory.get("name")+"\n2: "+sStory.get("name"));
