@@ -15,5 +15,26 @@ SR.AdminStoriesView = Backbone.View.extend({
     },
 
     events: {
+        "click .edit": "editStory",
+        "click .delete": "deleteStory"
+    },
+
+    editStory: function(evt){
+        var id = $(evt.target).data('id');
+        var router = new SR.AppRouter;
+        router.navigate("stories/" + id, {trigger: true});
+    },
+
+    deleteStory: function (evt) {
+        var self = this;
+        var id = $(evt.target).data('id');
+        var stories = this.model;
+
+        stories.get(id).destroy({
+            success: function () {
+                alert('Story deleted successfully');
+                self.render();
+            }
+        });
     }
 });

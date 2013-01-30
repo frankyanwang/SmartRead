@@ -2,21 +2,25 @@
     <table  class="table table-striped">
         <thead>
         <tr>
-            <th>ID</th>
+            <th>Picture</th>
             <th>Title</th>
             <th>Description</th>
             <th>Score</th>
             <th>Operation</th>
+            <th></th>
         </tr>
         </thead>
         <tbody>
         <% _.each(action, function(story) { %>
         <tr>
-            <td><%= story._id%></td>
+            <td><img id="picture" width="180" src="<%= story.picture %>"/></td>
             <td><%= story.name%></td>
             <td><%= story.description%></td>
             <td><%= story.score%></td>
-            <td><button class="btn btn-primary">Edit</button></td>
+            <td>
+                <button data-id="<%= story._id%>" class="edit btn btn-primary">Edit</button>
+            </td>
+            <td><button data-id="<%= story._id%>" class="btn delete">Delete</button></td>
         </tr>
         <% }); %>
         </tbody>
