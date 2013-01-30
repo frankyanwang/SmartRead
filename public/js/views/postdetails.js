@@ -25,7 +25,12 @@ SR.PostView = Backbone.View.extend({
         // Apply the change to the model
         var target = event.target;
         var change = {};
-        change[target.name] = target.value;
+        if (target.name === "tags") {
+            var tags = target.value.split(",");
+            change["tags"] = tags;
+        } else{
+            change[target.name] = target.value;
+        }
         this.model.set(change);
 
         // Run validation rule (if any) on changed item
@@ -55,7 +60,7 @@ SR.PostView = Backbone.View.extend({
             success: function (model) {
                 self.render();
                 SR.app.navigate('stories/' + model.id, false);
-                SR.utils.showAlert('Success!', 'Post saved successfully', 'alert-success');
+                SR.utils.showAlert('Success!', 'Story saved successfully', 'alert-success');
             },
             error: function () {
                 SR.utils.showAlert('Error', 'An error occurred while trying to delete this item', 'alert-error');
@@ -66,7 +71,7 @@ SR.PostView = Backbone.View.extend({
     deletePost: function () {
         this.model.destroy({
             success: function () {
-                alert('Post deleted successfully');
+                alert('Story deleted successfully');
                 window.history.back();
             }
         });
@@ -87,5 +92,4 @@ SR.PostView = Backbone.View.extend({
         };
         reader.readAsDataURL(this.pictureFile);
     }
-
 });

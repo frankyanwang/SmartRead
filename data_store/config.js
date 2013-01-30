@@ -31,6 +31,8 @@ config.forbiddenImageDomain = [
     "img.mycar168.com",
     "img1.ifensi.com",
     "img.guhantai.com",
+    "img0.pconline.com.cn",
+    "epaper.bjnews.com.cn",
     "imgs.focus.cn"
 ];
 
@@ -149,7 +151,9 @@ config.sites = {
 //		"http://feeds.geekpark.net" //not working with image
     ],
 
-    web:[],
+    web:[
+        "http://feeds.feedburner.com/yseeker"
+    ],
 
     fashion:[
         "http://www.fashiondes.com/rss"

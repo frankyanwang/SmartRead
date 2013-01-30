@@ -53,8 +53,8 @@ module.exports = function(app) {
     });
 
 //    app.post('/posts', PM.addPost);
-//    app.put('/posts/:id', PM.updatePost);
-//    app.delete('/posts/:id', PM.deletePost);
+    app.put('/stories/:id', PM.updatePost);
+    app.delete('/stories/:id', PM.deletePost);
 
     app.post('/login', function(req, res){
         AM.manualLogin(req.param('user'), req.param('pass'), function(e, account){

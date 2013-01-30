@@ -95,6 +95,10 @@ PM.findByCategory = function(category, callback){
     });
 };
 
+
+//===================================================================
+// Admin functions
+
 //PM.addPost = function(req, res) {
 //    var post = req.body;
 //    console.log('Adding post: ' + JSON.stringify(post));
@@ -108,32 +112,32 @@ PM.findByCategory = function(category, callback){
 //    });
 //};
 //
-//PM.updatePost = function(req, res) {
-//    var id = req.params.id;
-//    var post = req.body;
-//    delete post._id;
-//    console.log('Updating post: ' + id);
-//    console.log(JSON.stringify(post));
-    //    PM.posts.update({'_id':new BSON.ObjectID(id)}, post, {safe:true}, function(err, result) {
-//        if (err) {
-//            console.log('Error updating post: ' + err);
-//            res.send({'error':'An error has occurred'});
-//        } else {
-//            console.log('' + result + ' document(s) updated');
-//            res.send(post);
-//        }
-//    });
-//};
-//
-//PM.deletePost = function(req, res) {
-//    var id = req.params.id;
-//    console.log('Deleting post: ' + id);
-//    PM.posts.remove({'_id':new BSON.ObjectID(id)}, {safe:true}, function(err, result) {
-//        if (err) {
-//            res.send({'error':'An error has occurred - ' + err});
-//        } else {
-//            console.log('' + result + ' document(s) deleted');
-//            res.send(req.body);
-//        }
-//    });
-//};
+PM.updatePost = function(req, res) {
+    var id = req.params.id;
+    var post = req.body;
+    delete post._id;
+    console.log('Updating story: ' + id);
+    console.log(JSON.stringify(post));
+        PM.topStories.update({'_id':new BSON.ObjectID(id)}, post, {safe:true}, function(err, result) {
+        if (err) {
+            console.log('Error updating story: ' + err);
+            res.send({'error':'An error has occurred'});
+        } else {
+            console.log('' + result + ' document(s) updated');
+            res.send(post);
+        }
+    });
+};
+
+PM.deletePost = function(req, res) {
+    var id = req.params.id;
+    console.log('Deleting story: ' + id);
+    PM.topStories.remove({'_id':new BSON.ObjectID(id)}, {safe:true}, function(err, result) {
+        if (err) {
+            res.send({'error':'An error has occurred - ' + err});
+        } else {
+            console.log('' + result + ' document(s) deleted');
+            res.send(req.body);
+        }
+    });
+};

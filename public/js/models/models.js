@@ -45,6 +45,7 @@ SR.Post = Backbone.Model.extend({
         link: "",
         pubDate: "",
         source: "",
+        category: "",
         tags: [],
         picture: null
     }

@@ -134,13 +134,13 @@ SR.AppRouter = Backbone.Router.extend({
 
     },
 
-//    postDetails: function (id) {
-//        var post = new SR.Post({_id: id});
-//        post.fetch({success: function(){
-//            $("#content").html(new SR.PostView({model: post}).el);
-//        }});
-//        this.headerView.selectMenuItem();
-//    },
+    postDetails: function (id) {
+        var post = new SR.Post({_id: id});
+        post.fetch({success: function(){
+            $("#content").html(new SR.PostView({model: post}).el);
+        }});
+        //this.headerView.selectMenuItem();
+    },
 
 	addPost: function() {
         var post = new SR.Post();
@@ -180,7 +180,7 @@ SR.AppRouter = Backbone.Router.extend({
     },
 
     adminStories: function(){
-        this.renderHeader();
+        //this.renderHeader();
 
         var postList = new SR.PostCollection();
         postList.fetch({
