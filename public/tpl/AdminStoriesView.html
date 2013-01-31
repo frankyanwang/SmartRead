@@ -1,28 +1,43 @@
 <div class="row-fluid">
+    <div class="form-actions">
+        <a href="#admin-categories" class="btn btn-primary all">全部</a>
+        <a href="#admin-categories/news" class="btn news">新闻</a>
+        <a href="#admin-categories/military" class="btn military">军事</a>
+        <a href="#admin-categories/finance" class="btn finance">财经</a>
+        <a href="#admin-categories/web" class="btn web">互联网</a>
+        <a href="#admin-categories/realestate" class="btn realestate">房产</a>
+        <a href="#admin-categories/car" class="btn car">汽车</a>
+        <a href="#admin-categories/sports" class="btn sports">体育</a>
+        <a href="#admin-categories/entertain" class="btn entertain">娱乐</a>
+        <a href="#admin-categories/game" class="btn game">游戏</a>
+        <a href="#admin-categories/education" class="btn education">教育</a>
+        <a href="#admin-categories/women" class="btn women">女人</a>
+        <a href="#admin-categories/tech" class="btn tech">科技</a>
+        <a href="#admin-categories/social" class="btn social">社会</a>
+        <a href="#admin-categories/fashion" class="btn fashion">时尚</a>
+    </div>
     <table  class="table table-striped">
         <thead>
         <tr>
+            <th></th>
             <th>Picture</th>
             <th>Title</th>
             <th>Description</th>
             <th>Tags</th>
             <th>Score</th>
             <th>Operation</th>
-            <th></th>
         </tr>
         </thead>
         <tbody>
         <% _.each(action, function(story) { %>
         <tr>
+            <td><button data-id="<%= story._id%>" class="edit btn btn-primary">修改</button></td>
             <td><img id="picture" width="180" src="<%= story.picture %>"/></td>
             <td><%= story.name%></td>
             <td><%= story.description.substr(0,120) + "..."%></td>
             <td><%= story.tags.toString().split(',').join(' ') %></td>
             <td><%= story.score%></td>
-            <td>
-                <button data-id="<%= story._id%>" class="edit btn btn-primary">Edit</button>
-            </td>
-            <td><button data-id="<%= story._id%>" class="btn delete">Delete</button></td>
+            <td><button data-id="<%= story._id%>" class="btn delete">删除</button></td>
         </tr>
         <% }); %>
         </tbody>
