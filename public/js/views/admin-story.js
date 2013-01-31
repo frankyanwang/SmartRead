@@ -21,8 +21,7 @@ SR.AdminStoriesView = Backbone.View.extend({
 
     editStory: function(evt){
         var id = $(evt.target).data('id');
-        var router = new SR.AppRouter;
-        router.navigate("stories/" + id, {trigger: true});
+        SR.app.navigate("admin-stories/" + id, {trigger: true});
     },
 
     deleteStory: function (evt) {

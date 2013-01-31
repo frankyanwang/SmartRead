@@ -35,7 +35,50 @@ module.exports = function(app) {
         });
     });
 
-    app.get('/stories/:id', function(req, res){
+    // This is not used now
+//    app.get('/stories/:id', function(req, res){
+//        authenticate(req, res, function(){
+//            var storyId = req.params.id;
+//            PM.findById(storyId, function(err, story){
+////                console.log(req.session.user);
+////                console.log("Story: ", story);
+//                var userId = req.session.user._id;
+//                var userName = req.session.user.user;
+//                var tags = story.tags;
+//                EventMgr.insert(userId, userName, storyId, tags, function(){
+//                    //don't care for now success or fail.
+//                });
+//                res.send(200, story);
+//            });
+//        });
+//    });
+
+    // For admin use only
+    app.get('/admin-stories', function(req, res){
+        var category = Utils.getCategoryMapping()[req.query['category']];
+        console.log("category: ", category);
+        authenticate(req, res, function(){
+            if(category){
+                PM.findByCategoryForAdmin(category, function(err, items){
+                    if(err){
+                        console.log(err);
+                    }else{
+                        res.send(items);
+                    }
+                });
+            }else{
+                PM.findAllForAdmin(function(err, items){
+                    if(err){
+                        console.log(err);
+                    }else{
+                        res.send(items);
+                    }
+                });
+            }
+        });
+    });
+
+    app.get('/admin-stories/:id', function(req, res){
         authenticate(req, res, function(){
             var storyId = req.params.id;
             PM.findById(storyId, function(err, story){
@@ -52,9 +95,10 @@ module.exports = function(app) {
         });
     });
 
+
 //    app.post('/posts', PM.addPost);
-    app.put('/stories/:id', PM.updatePost);
-    app.delete('/stories/:id', PM.deletePost);
+    app.put('/admin-stories/:id', PM.updatePost);
+    app.delete('/admin-stories/:id', PM.deletePost);
 
     app.post('/login', function(req, res){
         AM.manualLogin(req.param('user'), req.param('pass'), function(e, account){

@@ -55,11 +55,12 @@ SR.PostView = Backbone.View.extend({
 
     savePost: function () {
         var self = this;
-        console.log('before save');
+        console.log('ADMIN: Before save');
         this.model.save(null, {
             success: function (model) {
+                console.log('ADMIN: Successfully saved');
                 self.render();
-                SR.app.navigate('stories/' + model.id, false);
+                SR.app.navigate('admin-stories/' + model.id, false);
                 SR.utils.showAlert('Success!', 'Story saved successfully', 'alert-success');
             },
             error: function () {
