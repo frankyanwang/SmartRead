@@ -41,13 +41,13 @@ public class ExtractTags {
     public static void main(String[] args) {
         ExtractTags et = new ExtractTags();
         
-        String str = "银行推专属理财“抢”年终奖";
+        String str = "“渐冻人“成功生子 图说幸福的奇迹 组图";
         System.out.println("Title: "+str);
         List<String> tags = et.getTags(str);
         for(String s:tags)
             System.out.println(s);
         
-        str = "银行推专属理财“抢”年终奖(图)";
+        str = "“渐冻人“成功生子宝宝真容 图说幸福的奇迹 组图";
         System.out.println("Title: "+str);
         tags = et.getTags(str);
         for(String s:tags)

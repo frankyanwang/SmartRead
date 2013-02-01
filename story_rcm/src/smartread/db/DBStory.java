@@ -14,7 +14,6 @@ import com.mongodb.BasicDBObject;
 import com.mongodb.DBCollection;
 import com.mongodb.DBCursor;
 import com.mongodb.DBObject;
-import com.mongodb.WriteConcern;
 
 import smartread.Story;
 import smartread.tag.ExtractTags;
@@ -106,11 +105,20 @@ public class DBStory extends DBBase{
                 if(score == null){
                     score = DEFAULT_STORY_SCORE;
                 }
-                obj.put(DB_SCORE_FIELD, score*(100+matchedTag)/100);
+                obj.put(DB_SCORE_FIELD, score*(100+matchedTag)/100.0);
                 list.add(obj);
                 size++;
             }
-            topStoryColl.insert(list, WriteConcern.ERRORS_IGNORED);
+            
+            //topStoryColl.insert(list, WriteConcern.ERRORS_IGNORED);
+        
+            for(DBObject story: list){
+                DBObject obj = topStoryColl.findAndModify(new BasicDBObject("_id", story.get("_id")), story);
+                if(obj==null){
+                    topStoryColl.insert(story);
+                }
+            }
+            
         } finally {
             cursor.close();
         }
@@ -145,7 +153,8 @@ public class DBStory extends DBBase{
                 DBObject obj = cursor.next();
                 date = (Date) obj.get("pubDate");
                 Double score = (Double) obj.get("score");
-                query = new BasicDBObject("pubDate", new BasicDBObject("$lt", date)).append("score", new BasicDBObject("$lt", score));
+                //query = new BasicDBObject("pubDate", new BasicDBObject("$lt", date)).append("score", new BasicDBObject("$lt", score));
+                query = new BasicDBObject("score", new BasicDBObject("$lt", score));
                 logger.debug("topStoryColl remove query: "+query);
                 topStoryColl.remove(query);
             }
@@ -181,7 +190,7 @@ public class DBStory extends DBBase{
         double f_similarity = 0;
         int f_count = 0;
 
-        if(fTags.size()<=3||sTags.size()<=3)
+        if(fTags.size()<3||sTags.size()<3)
             return 0;
         
         for(Object s: fTags){
