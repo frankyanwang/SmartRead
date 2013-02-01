@@ -8,17 +8,18 @@ SR.navigateHome = function(){
 SR.AppRouter = Backbone.Router.extend({
 
     routes: {
-        ""                      : "list",
-        "home"                  : "home",
-        "signup/:email"         : "signup",
-        "stories"	            : "list",
-        "stories/page/:page"	: "list",
-        "stories/add"           : "addPost",
-        "stories/:id"           : "postDetails",
-        "categories/:name"     : "listCategory",
-        "admin-invite"          : "adminInviteList",
-        "admin-stories"          : "adminStories",
-        "about"                 : "about"
+        ""                          : "list",
+        "home"                      : "home",
+        "signup/:email"             : "signup",
+        "stories"	                : "list",
+        "stories/page/:page"	    : "list",
+        "stories/add"               : "addPost",
+        "admin-stories/:id"         : "postDetails",
+        "categories/:name"          : "listCategory",
+        "admin-invite"              : "adminInviteList",
+        "admin-stories"             : "adminStories",
+        "admin-categories/:name"    : "adminCategory",
+        "about"                     : "about"
     },
 
     initialize: function () {
@@ -134,8 +135,24 @@ SR.AppRouter = Backbone.Router.extend({
 
     },
 
+    adminCategory: function(name){
+        var postList = new SR.PostCollectionForAdmin();
+        postList.fetch({
+            data: $.param({ category: name}),
+            success: function(model, response, options){
+                $(document).scrollTop(0);
+                $("#content").html(new SR.AdminStoriesView({model: postList}).el);
+            },
+            error: function(model, xhr, options){
+                if(xhr.status === 401){
+                    SR.navigateHome();
+                }
+            }
+        });
+    },
+
     postDetails: function (id) {
-        var post = new SR.Post({_id: id});
+        var post = new SR.PostForAdmin({_id: id});
         post.fetch({success: function(){
             $("#content").html(new SR.PostView({model: post}).el);
         }});
@@ -180,9 +197,9 @@ SR.AppRouter = Backbone.Router.extend({
     },
 
     adminStories: function(){
-        //this.renderHeader();
+        this.renderHeader();
 
-        var postList = new SR.PostCollection();
+        var postList = new SR.PostCollectionForAdmin();
         postList.fetch({
             success: function(model, response, options){
                 $("#content").html(new SR.AdminStoriesView({model: postList}).el);

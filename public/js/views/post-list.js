@@ -84,7 +84,7 @@ SR.PostListItemView = Backbone.View.extend({
     render: function () {
         var item = this.model.toJSON();
         item['description'] = item['description'].substr(0,120) + "...";
-        item['mappingClass'] = SR.utils.getColorMappingClass(_.first(item['category']));
+        item['mappingClass'] = SR.utils.getColorMappingClass(item['category']);
 
         $(this.el).html(this.template(item));
         return this;
