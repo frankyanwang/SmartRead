@@ -21,6 +21,8 @@ var CATEGORY_MAPPING = {
 
 var CATEGORY_MAPPING_REVERSE = _.invert(CATEGORY_MAPPING);
 
+var NUM_PER_PAGE = 100;
+
 SR.utils = {
 
     // Asynchronously load templates located in separate .html files
@@ -150,6 +152,10 @@ SR.utils = {
             "../css/img/bing_bg2.jpg",
             "../css/img/bg2.jpg"
         ], {duration: 5000, fade: 1000});
+    },
+
+    getNumberPerPage: function(){
+        return NUM_PER_PAGE;
     }
 };
 

@@ -18,7 +18,9 @@ SR.AppRouter = Backbone.Router.extend({
         "categories/:name"          : "listCategory",
         "admin-invite"              : "adminInviteList",
         "admin-stories"             : "adminStories",
+        "admin-stories/page/:page"  : "adminStories",
         "admin-categories/:name"    : "adminCategory",
+        "admin-categories/:name/page/:page"    : "adminCategory",
         "about"                     : "about"
     },
 
@@ -135,15 +137,16 @@ SR.AppRouter = Backbone.Router.extend({
 
     },
 
-    adminCategory: function(name){
+    adminCategory: function(name, page){
         this.renderHeader();
 
+        var p = page ? parseInt(page, 10) : 1;
         var postList = new SR.PostCollectionForAdmin();
         postList.fetch({
-            data: $.param({ category: name}),
+            data: $.param({ category: name }),
             success: function(model, response, options){
                 $(document).scrollTop(0);
-                $("#content").html(new SR.AdminStoriesView({model: postList}).el);
+                $("#content").html(new SR.AdminStoriesView({model: postList, page: p, origin: "admin-categories", category: name}).el);
             },
             error: function(model, xhr, options){
                 if(xhr.status === 401){
@@ -198,13 +201,15 @@ SR.AppRouter = Backbone.Router.extend({
         $('.backstretch').remove();
     },
 
-    adminStories: function(){
+    adminStories: function(page){
         this.renderHeader();
 
+        var p = page ? parseInt(page, 10) : 1;
         var postList = new SR.PostCollectionForAdmin();
         postList.fetch({
             success: function(model, response, options){
-                $("#content").html(new SR.AdminStoriesView({model: postList}).el);
+                $(document).scrollTop(0);
+                $("#content").html(new SR.AdminStoriesView({model: postList, page: p, origin: "admin-stories"}).el);
                 SR.utils.hideNotification();
 
             },
