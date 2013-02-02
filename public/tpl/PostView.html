@@ -7,15 +7,14 @@
             <legend>Story Details</legend>
             <br/>
 
-            <div class="row">
+            <div class="row-fluid">
                 <div class="span8">
 
                     <div class="control-group">
                         <label for="name" class="control-label">Name:</label>
 
                         <div class="controls">
-                            <textarea id="name" name="name" style="width: 90%;" rows="1"><%= name %></textarea>
-                            <span class="help-inline"></span>
+                            <input class="span10" id="name" name="name" type="text" value="<%= name %>"/>
                         </div>
                     </div>
 
@@ -41,7 +40,7 @@
                         <label for="link" class="control-label">Link:</label>
 
                         <div class="controls">
-                            <input id="link" name="link" type="text" value="<%= link %>"
+                            <input class="span10" id="link" name="link" type="text" value="<%= link %>"
                                    disabled/>
                         </div>
                     </div>

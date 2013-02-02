@@ -85,15 +85,23 @@ module.exports = function(app) {
         authenticate(req, res, function(){
             authorize(req, res, function(){
                 var storyId = req.params.id;
-                PM.findById(storyId, function(err, story){
-                    var userId = req.session.user._id;
-                    var userName = req.session.user.user;
-                    var tags = story.tags;
-                    EventMgr.insert(userId, userName, storyId, tags, function(){
-                        //don't care for now success or fail.
+                if (Utils.isHexString24(storyId)){
+                    PM.findById(storyId, function(err, story){
+                        if (err || !story){
+                            res.send("Page Not Found", 404);
+                        } else{
+                            var userId = req.session.user._id;
+                            var userName = req.session.user.user;
+                            var tags = story.tags;
+                            EventMgr.insert(userId, userName, storyId, tags, function(){
+                                //don't care for now success or fail.
+                            });
+                            res.send(200, story);
+                        }
                     });
-                    res.send(200, story);
-                });
+                } else{
+                    res.send("Page Not Found", 404);
+                }
             });
 
         });
@@ -104,7 +112,11 @@ module.exports = function(app) {
     app.put('/admin-stories/:id', function(req, res){
         authenticate(req, res, function(){
             authorize(req, res, function(){
-                PM.updatePost(req, res);
+                if (Utils.isHexString24(req.params.id)){
+                    PM.updatePost(req, res);
+                } else {
+                    res.send("Invalid story id!", 400);
+                }
             });
         });
 
@@ -113,7 +125,12 @@ module.exports = function(app) {
     app.delete('/admin-stories/:id', function(req, res){
         authenticate(req, res, function(){
             authorize(req, res, function(){
-                PM.deletePost(req, res);
+                if (Utils.isHexString24(req.params.id)){
+                    PM.deletePost(req, res);
+                } else{
+                    res.send("Invalid story id!", 400);
+                }
+
             });
         });
     });

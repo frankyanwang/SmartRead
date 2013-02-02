@@ -1,4 +1,5 @@
 <div class="row-fluid">
+    <div class="row-fluid">
     <div class="form-actions">
         <a href="#admin-categories" class="btn btn-primary all">全部</a>
         <a href="#admin-categories/news" class="btn news">新闻</a>
@@ -16,30 +17,33 @@
         <a href="#admin-categories/social" class="btn social">社会</a>
         <a href="#admin-categories/fashion" class="btn fashion">时尚</a>
     </div>
-    <table  class="table table-striped">
+    </div>
+    <div class="row-fluid">
+    <table  class="table table-striped span12">
         <thead>
         <tr>
-            <th></th>
-            <th>Picture</th>
-            <th>Title</th>
-            <th>Description</th>
-            <th>Tags</th>
-            <th>Score</th>
-            <th>Operation</th>
+            <th style="width: 8%">Edit</th>
+            <th style="width: 15%">Picture</th>
+            <th style="width: 20%">Title</th>
+            <th style="width: 34%">Description</th>
+            <th style="width: 10%">Tags</th>
+            <th style="width: 5%">Score</th>
+            <th style="width: 8%">Delete</th>
         </tr>
         </thead>
         <tbody>
         <% _.each(action, function(story) { %>
         <tr>
-            <td><button data-id="<%= story._id%>" class="edit btn btn-primary">修改</button></td>
+            <td><button data-id="<%= story._id%>" class="btn btn-small btn-primary edit"><i class="icon-pencil icon-white"></i> 修改</button></td>
             <td><img id="picture" width="180" src="<%= story.picture %>"/></td>
             <td><%= story.name%></td>
             <td><%= story.description.substr(0,120) + "..."%></td>
             <td><%= story.tags.toString().split(',').join(' ') %></td>
             <td><%= story.score%></td>
-            <td><button data-id="<%= story._id%>" class="btn delete">删除</button></td>
+            <td><button data-id="<%= story._id%>" class="btn btn-small btn-danger delete"><i class="icon-trash icon-white"></i> 删除</button></td>
         </tr>
         <% }); %>
         </tbody>
     </table>
+    </div>
 </div>

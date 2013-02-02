@@ -136,6 +136,8 @@ SR.AppRouter = Backbone.Router.extend({
     },
 
     adminCategory: function(name){
+        this.renderHeader();
+
         var postList = new SR.PostCollectionForAdmin();
         postList.fetch({
             data: $.param({ category: name}),
