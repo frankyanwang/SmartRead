@@ -76,7 +76,12 @@ public class DBStory extends DBBase{
         DBCollection tagsColl = db.getCollection(DB_TAGS_TABLE);
     
         Date date = new Date(System.currentTimeMillis()-1000*60*60*24*LOOKBACK_DAYS);
+        
+        //remove posts 7 days old
+        storyColl.remove(new BasicDBObject("pubDate", new BasicDBObject("$lt", date)));
+        
         BasicDBObject query  = new BasicDBObject("pubDate", new BasicDBObject("$gte", date));
+        
         DBCursor cursor = storyColl.find(query).sort(new BasicDBObject("score", -1)).sort(new BasicDBObject("pubDate", -1));
         
         ExtractTags et = new ExtractTags(); 
@@ -105,7 +110,7 @@ public class DBStory extends DBBase{
                 if(score == null){
                     score = DEFAULT_STORY_SCORE;
                 }
-                obj.put(DB_SCORE_FIELD, score*(100+matchedTag)/100.0);
+                obj.put(DB_SCORE_FIELD, (100+matchedTag)/100.0*score);
                 list.add(obj);
                 size++;
             }
