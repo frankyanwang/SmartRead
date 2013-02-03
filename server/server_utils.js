@@ -26,6 +26,25 @@ var CATEGORY_MAPPING = {
 
 var CATEGORY_MAPPING_REVERSE = _.invert(CATEGORY_MAPPING);
 
+var storyCount = 0;
+
+var categoryCount = {
+    news:       0,
+    military:   0,
+    finance:    0,
+    web:        0,
+    realestate: 0,
+    car:        0,
+    sports:     0,
+    entertain:  0,
+    game:       0,
+    education:  0,
+    women:      0,
+    tech:       0,
+    social:     0,
+    fashion:    0
+};
+
 Utils.log = function(){
     console.log.apply(null,arguments);
 };
@@ -58,3 +77,19 @@ Utils.isHexString24 = function(str){
         return false;
     }
 };
+
+Utils.setTopStoriesCount = function(count){
+    storyCount = count;
+};
+
+Utils.setCategoryCount = function (category, count){
+    categoryCount[CATEGORY_MAPPING_REVERSE[category]] = count;
+};
+
+Utils.getTopStoriesCount = function(){
+    return storyCount;
+};
+
+Utils.getCategoryCount = function(){
+    return categoryCount;
+}

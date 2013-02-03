@@ -33,7 +33,10 @@ config.forbiddenImageDomain = [
     "img.guhantai.com",
     "img0.pconline.com.cn",
     "epaper.bjnews.com.cn",
-    "imgs.focus.cn"
+    "imgs.focus.cn",
+    "img.265g.com",
+    "imgs.soufun.com",
+    "attach.hunantv.com"
 ];
 
 config.DEFAULT_INIT_SCORE = 100;

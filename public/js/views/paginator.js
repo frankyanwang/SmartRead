@@ -11,8 +11,10 @@ SR.Paginator = Backbone.View.extend({
 
     render:function () {
 
-        var items = this.model.models;
-        var len = items.length;
+        //var items = this.model.models;
+        var sLen = this.options.sCount;
+        var len = this.options.cCount ? this.options.cCount : sLen;
+
         var pageCount = Math.ceil(len / SR.utils.getNumberPerPage());
         var category = this.options.extras.category ? this.options.extras.category + "/" :  "";
         var url = "#" + this.options.extras.origin + "/" + category + "page/";

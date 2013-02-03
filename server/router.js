@@ -56,11 +56,13 @@ module.exports = function(app) {
     // For admin use only
     app.get('/admin-stories', function(req, res){
         var category = Utils.getCategoryMapping()[req.query['category']];
+        var page = req.query['page'];
+        var limit = req.query['limit'];
         console.log("category: ", category);
         authenticate(req, res, function(){
             authorize(req, res, function(){
                 if(category){
-                    PM.findByCategoryForAdmin(category, function(err, items){
+                    PM.findByCategoryForAdmin(category, page, limit, function(err, items){
                         if(err){
                             console.log(err);
                         }else{
@@ -68,7 +70,7 @@ module.exports = function(app) {
                         }
                     });
                 }else{
-                    PM.findAllForAdmin(function(err, items){
+                    PM.findAllForAdmin(page, limit, function(err, items){
                         if(err){
                             console.log(err);
                         }else{

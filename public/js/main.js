@@ -143,7 +143,7 @@ SR.AppRouter = Backbone.Router.extend({
         var p = page ? parseInt(page, 10) : 1;
         var postList = new SR.PostCollectionForAdmin();
         postList.fetch({
-            data: $.param({ category: name }),
+            data: $.param({ category: name, page: p, limit: SR.utils.getNumberPerPage()}),
             success: function(model, response, options){
                 $(document).scrollTop(0);
                 $("#content").html(new SR.AdminStoriesView({model: postList, page: p, origin: "admin-categories", category: name}).el);
@@ -207,6 +207,7 @@ SR.AppRouter = Backbone.Router.extend({
         var p = page ? parseInt(page, 10) : 1;
         var postList = new SR.PostCollectionForAdmin();
         postList.fetch({
+            data: $.param({ page: p, limit: SR.utils.getNumberPerPage()}),
             success: function(model, response, options){
                 $(document).scrollTop(0);
                 $("#content").html(new SR.AdminStoriesView({model: postList, page: p, origin: "admin-stories"}).el);
