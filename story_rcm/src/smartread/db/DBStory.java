@@ -177,12 +177,12 @@ public class DBStory extends DBBase{
                 DBObject sStory = stories.get(j);
 
                 BasicDBList s_tags = (BasicDBList) sStory.get(DB_TAG_FIELD);
-                if(checkSimilar(f_tags, s_tags)>=0.8){
+                if(checkSimilar(f_tags, s_tags)>0.5){
                         topStoryColl.remove(stories.remove(j));
                         j--;
                         logger.debug("These two stories are simiar:\n1: "+fStory.get("name")+"\n2: "+sStory.get("name"));
-                        logger.debug("Base story from top_stories: "+fStory.toString());
-                        logger.debug("Remove a similar story from top_stories: "+sStory.toString());
+                        //logger.debug("Base story from top_stories: "+fStory.toString());
+                        //logger.debug("Remove a similar story from top_stories: "+sStory.toString());
                 }
             }
         }
@@ -195,7 +195,7 @@ public class DBStory extends DBBase{
         double f_similarity = 0;
         int f_count = 0;
 
-        if(fTags.size()<3||sTags.size()<3)
+        if(fTags.size()<2||sTags.size()<2)
             return 0;
         
         for(Object s: fTags){

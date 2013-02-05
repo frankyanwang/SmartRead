@@ -41,13 +41,13 @@ public class ExtractTags {
     public static void main(String[] args) {
         ExtractTags et = new ExtractTags();
         
-        String str = "“渐冻人“成功生子 图说幸福的奇迹 组图";
+        String str = "施密特在新书中描绘了怎样的数字未来？";
         System.out.println("Title: "+str);
         List<String> tags = et.getTags(str);
         for(String s:tags)
             System.out.println(s);
         
-        str = "“渐冻人“成功生子宝宝真容 图说幸福的奇迹 组图";
+        str = "美国人也不知道“数字钱包”是啥";
         System.out.println("Title: "+str);
         tags = et.getTags(str);
         for(String s:tags)
