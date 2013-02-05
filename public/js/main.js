@@ -159,6 +159,7 @@ SR.AppRouter = Backbone.Router.extend({
     postDetails: function (id) {
         var post = new SR.PostForAdmin({_id: id});
         post.fetch({success: function(){
+            $(document).scrollTop(0);
             $("#content").html(new SR.PostView({model: post}).el);
         }});
         //this.headerView.selectMenuItem();

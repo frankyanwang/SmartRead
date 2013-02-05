@@ -36,7 +36,11 @@ config.forbiddenImageDomain = [
     "imgs.focus.cn",
     "img.265g.com",
     "imgs.soufun.com",
-    "attach.hunantv.com"
+    "attach.hunantv.com",
+    "image.fvideo.cn",
+    "img5.178.com",
+    "i01.static.olcdn.com",
+    "imge.gmw.cn"
 ];
 
 config.DEFAULT_INIT_SCORE = 100;

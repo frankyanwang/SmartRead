@@ -16,7 +16,7 @@ var DataProvider = require('../server/db-provider').DataProvider;
 function getTags(link, fn) {
 
     request(link, function (error, response, body) {
-        if (error) throw error
+        if (error) throw error;
         var $ = cheerio.load(body);
         fn($('meta[name=keywords]').attr('content'));
     });
@@ -67,9 +67,9 @@ function parseFeed(feedurl, dataProvider, category, callback) {
                                     //console.log(meta.link + "\n\n\n")
                                     var content = contentFilter(article.description, meta.link);
 
-                                    collection.update({
+                                    collection.findAndModify({
                                         guid:article.guid
-                                    }, {
+                                    }, [['_id', 1]], {
                                         _id:id,
                                         source:meta.title,
                                         name:article.title,
@@ -163,9 +163,9 @@ function parseFeedBaidu(feedurl, dataProvider, category, callback) {
 
                                 //console.log(tags);
 
-                                collection.update({
+                                collection.findAndModify({
                                     guid:article.guid
-                                }, {
+                                }, [['_id', 1]], {
                                     _id : id,
                                     source : getSourceName(article, meta),
                                     name : article.title,
@@ -225,12 +225,12 @@ function contentFilter(html, link) {
         case 'http://www.ifanr.com':
             var content = cheerio.load(html);
             var removable = cheerio.load(html);
-            removable('p').last().replaceWith('')
+            removable('p').last().replaceWith('');
             return {
                 summary: content('p').text(),
                 body: removable.html('p'),
                 wordcount: content('p').text().length
-            }
+            };
             break;
         case 'http://tech2ipo.com/feed':
             var content = cheerio.load(html);
@@ -238,17 +238,17 @@ function contentFilter(html, link) {
                 summary: content('p').text(),
                 body: content.html('p'),
                 wordcount: content('p').text().length
-            }
+            };
             break;
         case 'http://www.36kr.com/':
             var content = cheerio.load(html);
             var removable = cheerio.load(html);
-            removable('p').last().replaceWith('')
+            removable('p').last().replaceWith('');
             return {
                 summary: content('p').text(),
                 body: removable.html('p'),
                 wordcount: content('p').text().length
-            }
+            };
             break;
         case 'http://www.fashiondes.com/':
             var content = cheerio.load(html);
@@ -257,7 +257,7 @@ function contentFilter(html, link) {
                 summary: children ? children : content('p').text() ,
                 body: content.html(),
                 wordcount: children ? children.length : content('p').text().length
-            }
+            };
             break;
         default :
             var content = cheerio.load(html);
@@ -266,7 +266,7 @@ function contentFilter(html, link) {
                 summary: content('p').text(),
                 body: content.html('p'),
                 wordcount: content('p').text().length
-            }
+            };
             break;
     }
 }
