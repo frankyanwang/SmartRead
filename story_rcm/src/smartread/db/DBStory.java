@@ -114,14 +114,20 @@ public class DBStory extends DBBase{
                 list.add(obj);
                 size++;
             }
-            
-            //topStoryColl.insert(list, WriteConcern.ERRORS_IGNORED);
-        
+                    
             for(DBObject story: list){
                 DBObject obj = topStoryColl.findAndModify(new BasicDBObject("_id", story.get("_id")), story);
                 if(obj==null){
                     topStoryColl.insert(story);
                 }
+            }
+            
+            cursor = topStoryColl.find();
+            while (cursor.hasNext()){
+            	DBObject obj = cursor.next();
+            	if(!list.contains(obj)){
+            		topStoryColl.remove(obj);
+            	}
             }
             
         } finally {
