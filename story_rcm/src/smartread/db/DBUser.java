@@ -136,7 +136,6 @@ public class DBUser extends DBBase{
             try {
                 initDB();
             } catch (UnknownHostException e) {
-                // TODO Auto-generated catch block
                 e.printStackTrace();
                 return;
             }
