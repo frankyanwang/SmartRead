@@ -17,13 +17,13 @@ import com.mongodb.DBCollection;
 import com.mongodb.DBCursor;
 import com.mongodb.DBObject;
 
-public class DBServeEvent extends DBBase{
+public class DBServeEvent extends DBBase {
     private static final Logger logger = LogManager.getLogger(DBUser.class);
 
     public static Map<String, List<ServeEvent>> QueryEvents(int min) {
         Long starttime = System.currentTimeMillis();
 
-        if(mongoClient == null){
+        if (mongoClient == null) {
             try {
                 initDB();
             } catch (UnknownHostException e) {
@@ -36,27 +36,32 @@ public class DBServeEvent extends DBBase{
         Long time = current - min * 60 * 1000;
 
         DBCollection coll = db.getCollection(DB_SERVE_EVENT_TABLE);
-        BasicDBObject query = new BasicDBObject(DB_EVENT_TIME_CREATE_FIELD, new BasicDBObject(
-                "$gt", time));
+        BasicDBObject query = new BasicDBObject(DB_EVENT_TIME_CREATE_FIELD,
+                new BasicDBObject("$gt", time));
         DBCursor cursor = coll.find(query);
 
         Map<String, List<ServeEvent>> serves = new HashMap<String, List<ServeEvent>>();
         try {
             while (cursor.hasNext()) {
                 DBObject obj = cursor.next();
-                if(!serves.containsKey(obj.get(DB_UID_FIELD))){
-                    serves.put((String) obj.get(DB_UID_FIELD), new ArrayList<ServeEvent>());
+                if (!serves.containsKey(obj.get(DB_UID_FIELD))) {
+                    serves.put((String) obj.get(DB_UID_FIELD),
+                            new ArrayList<ServeEvent>());
                 }
-                
-                serves.get(obj.get(DB_UID_FIELD)).add(new ServeEvent((String) obj.get("storyId"),
-                        (String) obj.get(DB_UID_FIELD), ((BasicDBList) obj.get(DB_TAG_FIELD)).toString(),
-                        (Integer) obj.get(DB_EVENT_TIME_SPEND_FIELD)));
+
+                serves.get(obj.get(DB_UID_FIELD)).add(
+                        new ServeEvent((String) obj.get("storyId"),
+                                (String) obj.get(DB_UID_FIELD),
+                                ((BasicDBList) obj.get(DB_TAG_FIELD))
+                                        .toString(), (Integer) obj
+                                        .get(DB_EVENT_TIME_SPEND_FIELD)));
             }
         } finally {
             cursor.close();
         }
         Long endtime = System.currentTimeMillis();
-        logger.debug("Time(ms) taken to query serve events for the last "+min+" minutes: "+ String.valueOf(endtime-starttime));
+        logger.debug("Time(ms) taken to query serve events for the last " + min
+                + " minutes: " + String.valueOf(endtime - starttime));
         return serves;
     }
 }

@@ -2,9 +2,9 @@ package smartread;
 
 public class ServeEvent {
     String storyID;
-    String uid;
     String tags;
     int timespend;
+    String uid;
 
     public ServeEvent(String storyID, String uid, String tags, int timespend) {
         super();
@@ -18,32 +18,32 @@ public class ServeEvent {
         return storyID;
     }
 
-    public void setStoryID(String storyID) {
-        this.storyID = storyID;
-    }
-
-    public String getUid() {
-        return uid;
-    }
-
-    public void setUid(String uid) {
-        this.uid = uid;
-    }
-
     public String getTags() {
         return tags;
-    }
-
-    public void setTags(String tags) {
-        this.tags = tags;
     }
 
     public int getTimespend() {
         return timespend;
     }
 
+    public String getUid() {
+        return uid;
+    }
+
+    public void setStoryID(String storyID) {
+        this.storyID = storyID;
+    }
+
+    public void setTags(String tags) {
+        this.tags = tags;
+    }
+
     public void setTimespend(int timespend) {
         this.timespend = timespend;
     }
-    
+
+    public void setUid(String uid) {
+        this.uid = uid;
+    }
+
 }

@@ -120,8 +120,8 @@ PM.findAllForAdmin = function(page, limit, callback) {
 
 PM.findByCategoryForAdmin = function(category, page, limit, callback){
     var startTime = new Date().getTime();
-    var _page = parseInt(page, 10) ? parseInt(page, 10) : 0;
-    var _limit = parseInt(limit, 10) ? parseInt(limit, 10) : 0;
+    var _page = parseInt(page, 10) || 1;
+    var _limit = parseInt(limit, 10) || 0;
     if (category){
         PM.resetCategoryCount(category,
             PM.topStories.find({category: category}).sort({score:-1,pubDate:-1}).skip(_limit*(_page-1)).limit(_limit).toArray(function(err, items) {

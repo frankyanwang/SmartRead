@@ -16,7 +16,8 @@ import smartread.db.DBTags;
 import smartread.tag.ExtractTags;
 
 public class UpdateHotTag {
-    private static final Logger logger = LogManager.getLogger(UpdateHotTag.class);
+    private static final Logger logger = LogManager
+            .getLogger(UpdateHotTag.class);
 
     /**
      * @param args
@@ -27,28 +28,31 @@ public class UpdateHotTag {
             ExtractTags et = new ExtractTags();
             HashSet<String> hs = new HashSet<String>();
 
-            //Sogou
-            Document doc = Jsoup.connect("http://top.sogou.com/hotword0.html").get();
+            // Sogou
+            Document doc = Jsoup.connect("http://top.sogou.com/hotword0.html")
+                    .get();
             Elements links = doc.select("a");
-            
-            logger.debug("Total links from Sogou: "+links.size());
-            for(Element link: links){
+
+            logger.debug("Total links from Sogou: " + links.size());
+            for (Element link : links) {
                 String title = link.attr("title");
-                if(title==null||title.length()==0)
+                if (title == null || title.length() == 0) {
                     continue;
+                }
                 logger.debug(title);
                 List<String> tags = et.getTags(title);
                 logger.debug(tags);
                 hs.addAll(tags);
             }
-            
-            //Baidu
+
+            // Baidu
             doc = Jsoup.connect("http://hot.news.baidu.com/").get();
             links = doc.select("a");
-            logger.debug("Total links from Baidu: "+links.size());
-            for(Element link: links){
-                if(!link.attr("mon").equals("r=1"))
+            logger.debug("Total links from Baidu: " + links.size());
+            for (Element link : links) {
+                if (!link.attr("mon").equals("r=1")) {
                     continue;
+                }
                 logger.debug(link.text());
                 List<String> tags = et.getTags(link.text());
                 logger.debug(tags);

@@ -9,7 +9,8 @@ public class Utils {
         double multiplier = 1.0;
         for (String s : tags) {
             if (userInterest.containsKey(s)) {
-                multiplier = multiplier * (Math.sqrt(userInterest.get(s))/1000 + 1);
+                multiplier = multiplier
+                        * (Math.sqrt(userInterest.get(s)) / 1000 + 1);
             }
         }
         return multiplier;

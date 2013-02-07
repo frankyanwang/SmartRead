@@ -13,11 +13,11 @@ import com.mongodb.DBObject;
 
 public class DBTags extends DBBase {
     private static final Logger logger = LogManager.getLogger(DBTags.class);
-    
-    public static void addTags(List<String> tags){
+
+    public static void addTags(List<String> tags) {
         Long starttime = System.currentTimeMillis();
 
-        if(mongoClient == null){
+        if (mongoClient == null) {
             try {
                 initDB();
             } catch (UnknownHostException e) {
@@ -25,24 +25,27 @@ public class DBTags extends DBBase {
             }
         }
         DBCollection tagsColl = db.getCollection(DB_TAGS_TABLE);
-                
+
         List<DBObject> objs = new ArrayList<DBObject>();
-        for(String tag: tags){
+        for (String tag : tags) {
             DBObject obj = new BasicDBObject("name", tag);
             DBObject result = tagsColl.findOne(obj);
-            if(result!=null) continue;
+            if (result != null) {
+                continue;
+            }
             objs.add(obj);
         }
-        
+
         tagsColl.insert(objs);
         Long endtime = System.currentTimeMillis();
-        logger.debug("Time(ms) taken to add tags in DB: "+ String.valueOf(endtime-starttime));
+        logger.debug("Time(ms) taken to add tags in DB: "
+                + String.valueOf(endtime - starttime));
     }
-    
-    public static void cleanTags(){
+
+    public static void cleanTags() {
         Long starttime = System.currentTimeMillis();
 
-        if(mongoClient == null){
+        if (mongoClient == null) {
             try {
                 initDB();
             } catch (UnknownHostException e) {
@@ -52,6 +55,7 @@ public class DBTags extends DBBase {
         DBCollection tagsColl = db.getCollection(DB_TAGS_TABLE);
         tagsColl.drop();
         Long endtime = System.currentTimeMillis();
-        logger.debug("Time(ms) taken to drop tags in DB: "+ String.valueOf(endtime-starttime));
+        logger.debug("Time(ms) taken to drop tags in DB: "
+                + String.valueOf(endtime - starttime));
     }
 }

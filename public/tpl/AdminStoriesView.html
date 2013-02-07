@@ -35,14 +35,14 @@
         <tbody>
         <% _.each(action, function(story) { %>
         <tr>
-            <td><button data-id="<%= story._id%>" class="btn btn-small btn-primary edit"><i class="icon-pencil icon-white"></i> 修改</button></td>
+            <td><a data-id="<%= story._id%>" class="btn btn-small btn-primary edit"><i class="icon-pencil icon-white"></i> 修改</a></td>
             <td><img id="picture" width="180" src="<%= story.picture %>"/></td>
             <td><%= story.name%></td>
             <td><%= story.description.substr(0,120) + "..."%></td>
             <td><%= story.tags.toString().split(',').join(' ') %></td>
             <td><%= story.score%></td>
             <td><%= story.pubDate%></td>
-            <td><button data-id="<%= story._id%>" class="btn btn-small btn-danger delete"><i class="icon-trash icon-white"></i> 删除</button></td>
+            <td><a data-id="<%= story._id%>" class="btn btn-small btn-danger delete"><i class="icon-trash icon-white"></i> 删除</a></td>
         </tr>
         <% }); %>
         </tbody>

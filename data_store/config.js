@@ -40,7 +40,10 @@ config.forbiddenImageDomain = [
     "image.fvideo.cn",
     "img5.178.com",
     "i01.static.olcdn.com",
-    "imge.gmw.cn"
+    "imge.gmw.cn",
+    "www.dzwww.com",
+    "src.house.sina.com.cn",
+    "news.mycar168.com"
 ];
 
 config.DEFAULT_INIT_SCORE = 100;
